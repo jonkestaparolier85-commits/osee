@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXCEL TSHIMUNYI - Gestion des Commandes Fournisseurs</title>
+    <style>
+        :root {
+            --excel-green: #107c41;
+            --excel-dark-green: #0b582e;
+            --blue-dark: #0f2537;
+            --blue-sky: #00a4e4;
+            --blue-cell: #d9ebd9;
+            --yellow-header: #fff2cc;
+            --gray-excel: #f3f3f3;
+            --border-grid: #d4d4d4;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body, html { height: 100%; width: 100%; overflow: hidden; background-color: #f3f3f3; }
+
+        /* --- 1. ANIMATION D'OUVERTURE (7 SECONDES) --- */
+        #splash-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, var(--blue-dark) 0%, #05131d 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            animation: fadeOut 0.8s ease 6.5s forwards;
+        }
+
+        .splash-logo {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #ffffff, var(--blue-sky), var(--excel-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: zoomIn 1.5s ease-out;
+        }
+
+        .splash-sub {
+            font-size: 1.2rem;
+            color: var(--blue-sky);
+            margin-top: 10px;
+            opacity: 0;
+            animation: fadeIn 1s ease 1.5s forwards;
+        }
+
+        .loader-bar {
+            width: 250px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin-top: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loader-progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue-sky), var(--excel-green));
+            animation: fillProgress 6.5s linear forwards;
+        }
+
+        @keyframes zoomIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes fillProgress { 0% { width: 0%; } 100% { width: 100%; } }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+
+        /* --- 2. ÉCRAN DE CONNEXION / MOT DE PASSE ADMIN --- */
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 37, 55, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+            backdrop-filter: blur(5px);
+        }
+
+        .login-box {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            border-top: 6px solid var(--excel-green);
+        }
+
+        .login-box h2 {
+            color: var(--blue-dark);
+            margin-bottom: 5px;
+            font-size: 1.4rem;
+        }
+
+        .login-box p {
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            outline: none;
+            text-align: center;
+        }
+
+        .login-box input:focus {
+            border-color: var(--excel-green);
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 10px;
+            background: var(--excel-green);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .login-box button:hover {
+            background: var(--excel-dark-green);
+        }
+
+        .error-msg {
+            color: #d9534f;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* --- 3. INTERFACE APPLICATION EXCEL TSHIMUNYI --- */
+        .app-container { display: flex; flex-direction: column; height: 100vh; }
+
+        /* En-tête Supérieur */
+        header { background: var(--excel-dark-green); color: white; padding: 6px 12px; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; }
+        .app-title { font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .excel-icon { background: var(--excel-green); padding: 2px 6px; border-radius: 3px; font-weight: bold; }
+
+        /* Barre d'onglets de Menu Textuel Excel */
+        .excel-tabs { background: var(--excel-green); color: white; display: flex; gap: 2px; padding-left: 10px; font-size: 0.85rem; }
+        .tab-item { cursor: pointer; padding: 6px 15px; border-top-left-radius: 4px; border-top-right-radius: 4px; }
+        .tab-item:hover { background: rgba(255,255,255,0.15); }
+        .tab-item.active { background: #f3f3f3; color: #333; font-weight: bold; }
+
+        /* Ruban Amélioré, Allongé et Agrandi Style Excel complet */
+        .ribbon-full {
+            background: #f3f3f3;
+            border-bottom: 1px solid #ccc;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+            box-shadow: inset 0 -1px 2px rgba(0,0,0,0.05);
+        }
+
+        .ribbon-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-right: 15px;
+            border-right: 1px solid #ddd;
+        }
+
+        .ribbon-group-title {
+            font-size: 0.7rem;
+            color: #777;
+            text-align: center;
+            margin-top: 2px;
+        }
+
+        .btn-excel-tool {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 10px;
+            border: 1px solid transparent;
+            background: transparent;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: #333;
+            gap: 3px;
+        }
+
+        .btn-excel-tool:hover {
+            background: #e2e2e2;
+            border-color: #ccc;
+        }
+
+        .btn-excel-tool .icon {
+            font-size: 1.1rem;
+        }
+
+        .btn-primary-action {
+            background: var(--excel-green);
+            color: white;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 3px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+        }
+
+        .btn-primary-action:hover {
+            background: var(--excel-dark-green);
+        }
+
+        .btn-sky-action {
+            background: var(--blue-sky);
+            color: white;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 3px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+        }
+
+        /* Barre de Formule (fx) */
+        .formula-bar { background: white; border-bottom: 1px solid #ccc; display: flex; align-items: center; padding: 4px 10px; font-size: 0.85rem; }
+        .cell-address { font-weight: bold; color: #333; padding-right: 10px; border-right: 1px solid #ccc; width: 60px; text-align: center; }
+        .fx-symbol { color: #888; font-weight: bold; font-style: italic; margin: 0 10px; padding-right: 10px; border-right: 1px solid #ccc; }
+        .formula-input { border: none; width: 100%; outline: none; font-family: monospace; color: #333; font-size: 0.85rem; }
+
+        /* Zone de Grille de Calcul */
+        .sheet-container { flex: 1; overflow: auto; background: #e6e6e6; padding: 1px; }
+        .excel-table { border-collapse: collapse; width: 100%; min-width: 1100px; background: white; }
+        .excel-table th, .excel-table td { border: 1px solid var(--border-grid); padding: 5px 8px; font-size: 0.8rem; text-align: left; }
+        
+        /* En-têtes de colonnes (A, B, C...) */
+        .col-header { background: #f3f3f3; text-align: center !important; font-weight: normal; color: #555; width: 45px; }
+        .row-header { background: #f3f3f3; text-align: center; color: #555; font-weight: normal; width: 40px; }
+
+        /* Styles Spécifiques aux Blocs du Modèle */
+        .header-block { background: var(--blue-dark); color: white; font-weight: bold; text-align: center; font-size: 0.95rem; letter-spacing: 0.5px; }
+        .sub-header-yellow { background: var(--yellow-header); font-weight: bold; color: #333; }
+        .sub-header-green { background: #d8e4bc; font-weight: bold; color: #000; }
+
+        .badge { padding: 3px 8px; border-radius: 3px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        .badge-sent { background: #cce5ff; color: #004085; }
+        .badge-received { background: #d4edda; color: #155724; }
+
+        /* Onglets bas de feuille */
+        .sheet-tabs { background: #e6e6e6; display: flex; border-top: 1px solid #ccc; padding-left: 10px; }
+        .sheet-tab { background: white; padding: 5px 15px; font-size: 0.8rem; font-weight: bold; color: var(--excel-green); border-top: 2px solid var(--excel-green); border-right: 1px solid #ccc; cursor: pointer; }
+
+        @media (max-width: 768px) {
+            .splash-logo { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. ANIMATION DE 7 SECONDES (Inchangée) -->
+    <div id="splash-screen">
+        <div class="splash-logo">EXCEL TSHIMUNYI</div>
+        <div class="splash-sub">Établissement Tshimunyi - Gestion des Commandes</div>
+        <div class="loader-bar">
+            <div class="loader-progress"></div>
+        </div>
+    </div>
+
+    <!-- 2. ÉCRAN D'AUTHENTIFICATION MOT DE PASSE -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>Établissement Tshimunyi</h2>
+            <p>Saisissez le mot de passe administrateur pour accéder à l'application.</p>
+            <input type="password" id="adminPassword" placeholder="Mot de passe" onkeypress="checkEnter(event)">
+            <button onclick="authentifier()">Connexion</button>
+            <div id="errorMsg" class="error-msg">Mot de passe incorrect !</div>
+        </div>
+    </div>
+
+    <!-- 3. APPLICATION PRINCIPALE -->
+    <div class="app-container">
+        <!-- En-tête -->
+        <header>
+            <div class="app-title">
+                <span class="excel-icon">XLS</span>
+                EXCEL TSHIMUNYI — GESTION DES COMMANDES CHEZ LES FOURNISSEURS
+            </div>
+            <div>Etablissement Tshimunyi | Admin</div>
+        </header>
+
+        <!-- Barre de Menu Textuel Excel -->
+        <div class="excel-tabs">
+            <div class="tab-item active">Fichier</div>
+            <div class="tab-item">Accueil</div>
+            <div class="tab-item">Insertion</div>
+            <div class="tab-item">Mise en page</div>
+            <div class="tab-item">Formules</div>
+            <div class="tab-item">Données</div>
+            <div class="tab-item">Révision</div>
+            <div class="tab-item">Affichage</div>
+        </div>
+
+        <!-- Ruban Agrandit et Allongé Style Excel -->
+        <div class="ribbon-full">
+            <!-- Groupe 1: Actions Rapides -->
+            <div class="ribbon-group">
+                <button class="btn-primary-action" onclick="ajouterCommande()">
+                    <span>➕</span> Nouvelle Commande
+                </button>
+                <button class="btn-sky-action" onclick="exporterExcel()">
+                    <span>📥</span> Exporter (Excel / CSV)
+                </button>
+            </div>
+
+            <!-- Groupe 2: Presse-papiers & Police -->
+            <div class="ribbon-group">
+                <button class="btn-excel-tool"><span class="icon">📋</span>Coller</button>
+                <button class="btn-excel-tool"><span class="icon">✂️</span>Couper</button>
+                <button class="btn-excel-tool"><span class="icon"><b>B</b></span>Gras</button>
+                <button class="btn-excel-tool"><span class="icon"><i>I</i></span>Italique</button>
+                <button class="btn-excel-tool"><span class="icon">🎨</span>Couleur</button>
+            </div>
+
+            <!-- Groupe 3: Alignement & Nombre -->
+            <div class="ribbon-group">
+                <button class="btn-excel-tool"><span class="icon">⇐</span>Gauche</button>
+                <button class="btn-excel-tool"><span class="icon">≡</span>Centre</button>
+                <button class="btn-excel-tool"><span class="icon">⇒</span>Droite</button>
+                <button class="btn-excel-tool"><span class="icon">💲</span>Monnaie ($)</button>
+                <button class="btn-excel-tool"><span class="icon">%</span>Pourcent</button>
+            </div>
+
+            <!-- Groupe 4: Formules & Recherche -->
+            <div class="ribbon-group">
+                <button class="btn-excel-tool" onclick="calculerTotal()"><span class="icon">∑</span>Somme Auto</button>
+                <div style="display: flex; flex-direction: column; gap: 3px;">
+                    <span style="font-size: 0.75rem; color: #555;">🔍 Recherche rapide:</span>
+                    <input type="text" id="searchInput" onkeyup="filtrerTable()" placeholder="Rechercher..." style="padding: 3px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 0.75rem;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Barre de Formule -->
+        <div class="formula-bar">
+            <span class="cell-address">A1</span>
+            <span class="fx-symbol">fx</span>
+            <input type="text" class="formula-input" value="=SOMME(COMMANDES_FOURNISSEURS_TSHIMUNYI)" readonly>
+        </div>
+
+        <!-- Grille Style Feuille de Calcul (Modèle Réel) -->
+        <div class="sheet-container">
+            <table class="excel-table" id="commandeTable">
+                <thead>
+                    <!-- Ligne d'en-tête Excel A, B, C... -->
+                    <tr>
+                        <th class="col-header"></th>
+                        <th class="col-header">A</th>
+                        <th class="col-header">B</th>
+                        <th class="col-header">C</th>
+                        <th class="col-header">D</th>
+                        <th class="col-header">E</th>
+                        <th class="col-header">F</th>
+                        <th class="col-header">G</th>
+                        <th class="col-header">H</th>
+                    </tr>
+                    <!-- Titre Principal de la Grille -->
+                    <tr>
+                        <td class="row-header">1</td>
+                        <td colspan="8" class="header-block">
+                            ÉTABLISSEMENT TSHIMUNYI — SUIVI DES COMMANDES PASSÉES CHEZ LES FOURNISSEURS
+                        </td>
+                    </tr>
+                    <!-- Sous-en-têtes de colonnes colorées -->
+                    <tr class="sub-header-yellow">
+                        <td class="row-header">2</td>
+                        <td>N° Commande</td>
+                        <td>Fournisseur</td>
+                        <td>Désignation Produit / Article</td>
+                        <td>Qté Commandée</td>
+                        <td>Prix Unitaire ($)</td>
+                        <td>Montant Total ($)</td>
+                        <td>Statut Commande</td>
+                        <td>Actions</td>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Données chargées dynamiquement -->
+                </tbody>
+                <tfoot>
+                    <tr class="sub-header-green">
+                        <td class="row-header">Σ</td>
+                        <td colspan="4" style="text-align: right;"><b>TOTAL GÉNÉRAL DES COMMANDES :</b></td>
+                        <td id="totalMontant" colspan="3" style="font-size:0.9rem; font-weight:bold;">0.00 $</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Bas de page Excel (Onglets) -->
+        <div class="sheet-tabs">
+            <div class="sheet-tab">Feuil1 - Commandes Fournisseurs</div>
+        </div>
+    </div>
+
+    <script>
+        // --- GESTION DU MOT DE PASSE ADMIN ---
+        function authentifier() {
+            const pwd = document.getElementById('adminPassword').value;
+            if (pwd === 'Forever') {
+                document.getElementById('login-screen').style.display = 'none';
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
+
+        function checkEnter(e) {
+            if (e.key === 'Enter') {
+                authentifier();
+            }
+        }
+
+        // Base de données des commandes chez les fournisseurs
+        let commandes = JSON.parse(localStorage.getItem('TSHIMUNYI_COMMANDES')) || [
+            { id: 101, num: 'CMD-2026-001', fournisseur: 'SOCIETE PLASTIQUE RDC', produit: 'Emballages Sachets 1L', qte: 500, pu: 0.20, statut: 'Envoyée' },
+            { id: 102, num: 'CMD-2026-002', fournisseur: 'AFRICA CONTAINERS', produit: 'Bidons Vides 5L', qte: 200, pu: 1.50, statut: 'Reçue' },
+            { id: 103, num: 'CMD-2026-003', fournisseur: 'LOGISTIQUE KATANGA', produit: 'Palettes en Bois', qte: 50, pu: 12.00, statut: 'En Attente' }
+        ];
+
+        function afficherCommandes() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            let total = 0;
+
+            commandes.forEach((cmd, index) => {
+                const totalLigne = cmd.qte * cmd.pu;
+                total += totalLigne;
+
+                let badgeClass = 'badge-pending';
+                if(cmd.statut === 'Envoyée') badgeClass = 'badge-sent';
+                if(cmd.statut === 'Reçue') badgeClass = 'badge-received';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="row-header">${index + 3}</td>
+                    <td><b>${cmd.num}</b></td>
+                    <td>${cmd.fournisseur}</td>
+                    <td>${cmd.produit}</td>
+                    <td><b>${cmd.qte}</b></td>
+                    <td>${cmd.pu.toFixed(2)} $</td>
+                    <td><b>${totalLigne.toFixed(2)} $</b></td>
+                    <td><span class="badge ${badgeClass}">${cmd.statut}</span></td>
+                    <td>
+                        <button onclick="changerStatut(${cmd.id})" style="font-size:0.7rem; padding: 2px 5px; cursor:pointer;">🔄 Statut</button>
+                        <button onclick="supprimerCommande(${cmd.id})" style="font-size:0.7rem; padding: 2px 5px; color:red; cursor:pointer;">❌</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('totalMontant').innerText = total.toFixed(2) + ' $';
+            localStorage.setItem('TSHIMUNYI_COMMANDES', JSON.stringify(commandes));
+        }
+
+        function ajouterCommande() {
+            const fournisseur = prompt("Nom du Fournisseur :");
+            if (!fournisseur) return;
+            const produit = prompt("Désignation du Produit :");
+            const qte = parseInt(prompt("Quantité à commander :") || "0");
+            const pu = parseFloat(prompt("Prix Unitaire en ($) :") || "0");
+
+            const nouvelleCmd = {
+                id: Date.now(),
+                num: 'CMD-2026-00' + (commandes.length + 1),
+                fournisseur,
+                produit,
+                qte,
+                pu,
+                statut: 'En Attente'
+            };
+
+            commandes.push(nouvelleCmd);
+            afficherCommandes();
+        }
+
+        function changerStatut(id) {
+            const cmd = commandes.find(c => c.id === id);
+            if (!cmd) return;
+
+            if (cmd.statut === 'En Attente') cmd.statut = 'Envoyée';
+            else if (cmd.statut === 'Envoyée') cmd.statut = 'Reçue';
+            else cmd.statut = 'En Attente';
+
+            afficherCommandes();
+        }
+
+        function supprimerCommande(id) {
+            if (confirm("Supprimer cette commande de l'Établissement Tshimunyi ?")) {
+                commandes = commandes.filter(c => c.id !== id);
+                afficherCommandes();
+            }
+        }
+
+        function filtrerTable() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
+            });
+        }
+
+        function exporterExcel() {
+            let csv = 'Numero;Fournisseur;Produit;Quantite;Prix Unitaire;Total;Statut\n';
+            commandes.forEach(c => {
+                csv += `${c.num};${c.fournisseur};${c.produit};${c.qte};${c.pu};${(c.qte*c.pu).toFixed(2)};${c.statut}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Commandes_Tshimunyi_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        }
+
+        function calculerTotal() {
+            afficherCommandes();
+            alert("Totaux recalculés avec succès !");
+        }
+
+        // Chargement initial
+        afficherCommandes();
+    </script>
+</body>
+</html>
