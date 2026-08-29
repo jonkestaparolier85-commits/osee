@@ -3,554 +3,585 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EXCEL TSHIMUNYI - Gestion des Commandes Fournisseurs</title>
+    <title>Salvatore Market - Catalogue & Prix</title>
     <style>
         :root {
-            --excel-green: #107c41;
-            --excel-dark-green: #0b582e;
-            --blue-dark: #0f2537;
-            --blue-sky: #00a4e4;
-            --blue-cell: #d9ebd9;
-            --yellow-header: #fff2cc;
-            --gray-excel: #f3f3f3;
-            --border-grid: #d4d4d4;
+            --primary-color: #0d6efd;
+            --primary-hover: #0b5ed7;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --text-muted: #6c757d;
+            --border-color: #e9ecef;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body, html { height: 100%; width: 100%; overflow: hidden; background-color: #f3f3f3; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
 
-        /* --- 1. ANIMATION D'OUVERTURE (7 SECONDES) --- */
-        #splash-screen {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(135deg, var(--blue-dark) 0%, #05131d 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 40px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #0d6efd, #0a58ca);
             color: white;
-            animation: fadeOut 0.8s ease 6.5s forwards;
-        }
-
-        .splash-logo {
-            font-size: 3.5rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-            background: linear-gradient(90deg, #ffffff, var(--blue-sky), var(--excel-green));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: zoomIn 1.5s ease-out;
-        }
-
-        .splash-sub {
-            font-size: 1.2rem;
-            color: var(--blue-sky);
-            margin-top: 10px;
-            opacity: 0;
-            animation: fadeIn 1s ease 1.5s forwards;
-        }
-
-        .loader-bar {
-            width: 250px;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            margin-top: 30px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .loader-progress {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--blue-sky), var(--excel-green));
-            animation: fillProgress 6.5s linear forwards;
-        }
-
-        @keyframes zoomIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes fadeIn { to { opacity: 1; } }
-        @keyframes fillProgress { 0% { width: 0%; } 100% { width: 100%; } }
-        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-
-        /* --- 2. ÉCRAN DE CONNEXION / MOT DE PASSE ADMIN --- */
-        #login-screen {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 37, 55, 0.95);
+            padding: 16px 20px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            z-index: 9998;
-            backdrop-filter: blur(5px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
         }
 
-        .login-box {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 380px;
-            text-align: center;
-            border-top: 6px solid var(--excel-green);
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
         }
 
-        .login-box h2 {
-            color: var(--blue-dark);
-            margin-bottom: 5px;
-            font-size: 1.4rem;
-        }
-
-        .login-box p {
-            color: #666;
+        .btn-admin-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 20px;
             font-size: 0.85rem;
-            margin-bottom: 20px;
-        }
-
-        .login-box input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            outline: none;
-            text-align: center;
-        }
-
-        .login-box input:focus {
-            border-color: var(--excel-green);
-        }
-
-        .login-box button {
-            width: 100%;
-            padding: 10px;
-            background: var(--excel-green);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 0.9rem;
             transition: background 0.2s;
         }
 
-        .login-box button:hover {
-            background: var(--excel-dark-green);
+        .btn-admin-toggle:active {
+            background: rgba(255, 255, 255, 0.35);
         }
 
-        .error-msg {
-            color: #d9534f;
-            font-size: 0.8rem;
-            margin-top: 10px;
+        /* Main Container */
+        .container {
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Search Box */
+        .search-box {
+            margin-bottom: 16px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ced4da;
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+            outline: none;
+            background-color: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+        }
+
+        /* Admin Form */
+        .admin-panel {
+            background: var(--card-bg);
+            padding: 18px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
             display: none;
         }
 
-        /* --- 3. INTERFACE APPLICATION EXCEL TSHIMUNYI --- */
-        .app-container { display: flex; flex-direction: column; height: 100vh; }
+        .admin-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
 
-        /* En-tête Supérieur */
-        header { background: var(--excel-dark-green); color: white; padding: 6px 12px; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; }
-        .app-title { font-weight: bold; display: flex; align-items: center; gap: 8px; }
-        .excel-icon { background: var(--excel-green); padding: 2px 6px; border-radius: 3px; font-weight: bold; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        /* Barre d'onglets de Menu Textuel Excel */
-        .excel-tabs { background: var(--excel-green); color: white; display: flex; gap: 2px; padding-left: 10px; font-size: 0.85rem; }
-        .tab-item { cursor: pointer; padding: 6px 15px; border-top-left-radius: 4px; border-top-right-radius: 4px; }
-        .tab-item:hover { background: rgba(255,255,255,0.15); }
-        .tab-item.active { background: #f3f3f3; color: #333; font-weight: bold; }
-
-        /* Ruban Amélioré, Allongé et Agrandi Style Excel complet */
-        .ribbon-full {
-            background: #f3f3f3;
-            border-bottom: 1px solid #ccc;
-            padding: 8px 15px;
+        .admin-panel h2 {
+            font-size: 1.05rem;
+            margin-bottom: 12px;
+            color: var(--primary-color);
             display: flex;
             align-items: center;
-            gap: 20px;
-            overflow-x: auto;
-            white-space: nowrap;
-            box-shadow: inset 0 -1px 2px rgba(0,0,0,0.05);
+            justify-content: space-between;
         }
 
-        .ribbon-group {
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            background: #fff;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            height: 65px;
+        }
+
+        /* Preview container */
+        .image-preview-container {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding-right: 15px;
-            border-right: 1px solid #ddd;
+            gap: 12px;
+            margin-top: 6px;
         }
 
-        .ribbon-group-title {
-            font-size: 0.7rem;
-            color: #777;
-            text-align: center;
-            margin-top: 2px;
+        .image-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+            display: none;
         }
 
-        .btn-excel-tool {
-            display: inline-flex;
-            flex-direction: column;
+        .btn-submit {
+            width: 100%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: background 0.2s;
+        }
+
+        .btn-submit:active {
+            background: var(--primary-hover);
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        /* Product List */
+        .product-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 14px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            border: 1px solid var(--border-color);
+            display: flex;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .product-img {
+            width: 75px;
+            height: 75px;
+            border-radius: 10px;
+            object-fit: cover;
+            background-color: #e9ecef;
+            flex-shrink: 0;
+            display: flex;
             align-items: center;
             justify-content: center;
-            padding: 6px 10px;
-            border: 1px solid transparent;
-            background: transparent;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.75rem;
-            color: #333;
-            gap: 3px;
+            color: #adb5bd;
+            font-size: 1.8rem;
+            overflow: hidden;
         }
 
-        .btn-excel-tool:hover {
-            background: #e2e2e2;
-            border-color: #ccc;
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .btn-excel-tool .icon {
-            font-size: 1.1rem;
+        .product-details {
+            flex-grow: 1;
+            min-width: 0;
         }
 
-        .btn-primary-action {
-            background: var(--excel-green);
-            color: white;
-            font-weight: bold;
-            padding: 6px 12px;
-            border-radius: 3px;
-            border: none;
-            cursor: pointer;
+        .product-header {
             display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 4px;
         }
 
-        .btn-primary-action:hover {
-            background: var(--excel-dark-green);
+        .product-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-color);
+            word-wrap: break-word;
         }
 
-        .btn-sky-action {
-            background: var(--blue-sky);
-            color: white;
-            font-weight: bold;
-            padding: 6px 12px;
-            border-radius: 3px;
-            border: none;
-            cursor: pointer;
+        .product-price {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #198754;
+            white-space: nowrap;
+        }
+
+        .product-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.35;
+            word-wrap: break-word;
+        }
+
+        .admin-actions {
+            margin-top: 8px;
+            display: none;
+            gap: 8px;
+        }
+
+        .admin-only .admin-actions {
             display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
         }
 
-        /* Barre de Formule (fx) */
-        .formula-bar { background: white; border-bottom: 1px solid #ccc; display: flex; align-items: center; padding: 4px 10px; font-size: 0.85rem; }
-        .cell-address { font-weight: bold; color: #333; padding-right: 10px; border-right: 1px solid #ccc; width: 60px; text-align: center; }
-        .fx-symbol { color: #888; font-weight: bold; font-style: italic; margin: 0 10px; padding-right: 10px; border-right: 1px solid #ccc; }
-        .formula-input { border: none; width: 100%; outline: none; font-family: monospace; color: #333; font-size: 0.85rem; }
+        .btn-action {
+            padding: 5px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
 
-        /* Zone de Grille de Calcul */
-        .sheet-container { flex: 1; overflow: auto; background: #e6e6e6; padding: 1px; }
-        .excel-table { border-collapse: collapse; width: 100%; min-width: 1100px; background: white; }
-        .excel-table th, .excel-table td { border: 1px solid var(--border-grid); padding: 5px 8px; font-size: 0.8rem; text-align: left; }
-        
-        /* En-têtes de colonnes (A, B, C...) */
-        .col-header { background: #f3f3f3; text-align: center !important; font-weight: normal; color: #555; width: 45px; }
-        .row-header { background: #f3f3f3; text-align: center; color: #555; font-weight: normal; width: 40px; }
+        .btn-edit { background: #ffc107; color: #000; }
+        .btn-delete { background: #dc3545; color: #fff; }
 
-        /* Styles Spécifiques aux Blocs du Modèle */
-        .header-block { background: var(--blue-dark); color: white; font-weight: bold; text-align: center; font-size: 0.95rem; letter-spacing: 0.5px; }
-        .sub-header-yellow { background: var(--yellow-header); font-weight: bold; color: #333; }
-        .sub-header-green { background: #d8e4bc; font-weight: bold; color: #000; }
+        .empty-msg {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 40px;
+            font-size: 0.95rem;
+        }
 
-        .badge { padding: 3px 8px; border-radius: 3px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
-        .badge-pending { background: #fff3cd; color: #856404; }
-        .badge-sent { background: #cce5ff; color: #004085; }
-        .badge-received { background: #d4edda; color: #155724; }
+        /* Responsive image popup */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 200;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+        }
 
-        /* Onglets bas de feuille */
-        .sheet-tabs { background: #e6e6e6; display: flex; border-top: 1px solid #ccc; padding-left: 10px; }
-        .sheet-tab { background: white; padding: 5px 15px; font-size: 0.8rem; font-weight: bold; color: var(--excel-green); border-top: 2px solid var(--excel-green); border-right: 1px solid #ccc; cursor: pointer; }
-
-        @media (max-width: 768px) {
-            .splash-logo { font-size: 2.2rem; }
+        .modal img {
+            max-width: 90%;
+            max-height: 80%;
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. ANIMATION DE 7 SECONDES (Inchangée) -->
-    <div id="splash-screen">
-        <div class="splash-logo">EXCEL TSHIMUNYI</div>
-        <div class="splash-sub">Établissement Tshimunyi - Gestion des Commandes</div>
-        <div class="loader-bar">
-            <div class="loader-progress"></div>
-        </div>
-    </div>
+    <header>
+        <h1>Salvatore Market 🛒</h1>
+        <button class="btn-admin-toggle" id="adminToggleBtn" onclick="toggleAdmin()">🔒 Admin</button>
+    </header>
 
-    <!-- 2. ÉCRAN D'AUTHENTIFICATION MOT DE PASSE -->
-    <div id="login-screen">
-        <div class="login-box">
-            <h2>Établissement Tshimunyi</h2>
-            <p>Saisissez le mot de passe administrateur pour accéder à l'application.</p>
-            <input type="password" id="adminPassword" placeholder="Mot de passe" onkeypress="checkEnter(event)">
-            <button onclick="authentifier()">Connexion</button>
-            <div id="errorMsg" class="error-msg">Mot de passe incorrect !</div>
-        </div>
-    </div>
-
-    <!-- 3. APPLICATION PRINCIPALE -->
-    <div class="app-container">
-        <!-- En-tête -->
-        <header>
-            <div class="app-title">
-                <span class="excel-icon">XLS</span>
-                EXCEL TSHIMUNYI — GESTION DES COMMANDES CHEZ LES FOURNISSEURS
-            </div>
-            <div>Etablissement Tshimunyi | Admin</div>
-        </header>
-
-        <!-- Barre de Menu Textuel Excel -->
-        <div class="excel-tabs">
-            <div class="tab-item active">Fichier</div>
-            <div class="tab-item">Accueil</div>
-            <div class="tab-item">Insertion</div>
-            <div class="tab-item">Mise en page</div>
-            <div class="tab-item">Formules</div>
-            <div class="tab-item">Données</div>
-            <div class="tab-item">Révision</div>
-            <div class="tab-item">Affichage</div>
+    <div class="container">
+        
+        <!-- Recherche -->
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Rechercher un produit..." oninput="filterProducts()">
         </div>
 
-        <!-- Ruban Agrandit et Allongé Style Excel -->
-        <div class="ribbon-full">
-            <!-- Groupe 1: Actions Rapides -->
-            <div class="ribbon-group">
-                <button class="btn-primary-action" onclick="ajouterCommande()">
-                    <span>➕</span> Nouvelle Commande
-                </button>
-                <button class="btn-sky-action" onclick="exporterExcel()">
-                    <span>📥</span> Exporter (Excel / CSV)
-                </button>
-            </div>
-
-            <!-- Groupe 2: Presse-papiers & Police -->
-            <div class="ribbon-group">
-                <button class="btn-excel-tool"><span class="icon">📋</span>Coller</button>
-                <button class="btn-excel-tool"><span class="icon">✂️</span>Couper</button>
-                <button class="btn-excel-tool"><span class="icon"><b>B</b></span>Gras</button>
-                <button class="btn-excel-tool"><span class="icon"><i>I</i></span>Italique</button>
-                <button class="btn-excel-tool"><span class="icon">🎨</span>Couleur</button>
-            </div>
-
-            <!-- Groupe 3: Alignement & Nombre -->
-            <div class="ribbon-group">
-                <button class="btn-excel-tool"><span class="icon">⇐</span>Gauche</button>
-                <button class="btn-excel-tool"><span class="icon">≡</span>Centre</button>
-                <button class="btn-excel-tool"><span class="icon">⇒</span>Droite</button>
-                <button class="btn-excel-tool"><span class="icon">💲</span>Monnaie ($)</button>
-                <button class="btn-excel-tool"><span class="icon">%</span>Pourcent</button>
-            </div>
-
-            <!-- Groupe 4: Formules & Recherche -->
-            <div class="ribbon-group">
-                <button class="btn-excel-tool" onclick="calculerTotal()"><span class="icon">∑</span>Somme Auto</button>
-                <div style="display: flex; flex-direction: column; gap: 3px;">
-                    <span style="font-size: 0.75rem; color: #555;">🔍 Recherche rapide:</span>
-                    <input type="text" id="searchInput" onkeyup="filtrerTable()" placeholder="Rechercher..." style="padding: 3px 6px; border: 1px solid #ccc; border-radius: 3px; font-size: 0.75rem;">
+        <!-- Panneau d'administration -->
+        <div class="admin-panel" id="adminPanel">
+            <h2>
+                <span id="formTitle">Ajouter un produit</span>
+                <button type="button" class="btn-cancel" id="btnCancel" onclick="resetForm()" style="display:none;">Annuler</button>
+            </h2>
+            <form id="productForm" onsubmit="saveProduct(event)">
+                <input type="hidden" id="productId">
+                <input type="hidden" id="productImageData">
+                
+                <div class="form-group">
+                    <label for="productName">Nom du produit *</label>
+                    <input type="text" id="productName" placeholder="Ex: Huile d'olive 1L" required>
                 </div>
-            </div>
+                
+                <div class="form-group">
+                    <label for="productPrice">Prix *</label>
+                    <input type="text" id="productPrice" placeholder="Ex: 5000 FC ou 2.5 $" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="productDetail">Détails / Description</label>
+                    <textarea id="productDetail" placeholder="Ex: Marque Salvatore, extra vierge, provenance..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="productImage">Photo du produit</label>
+                    <input type="file" id="productImage" accept="image/*" onchange="handleImageUpload(event)">
+                    <div class="image-preview-container">
+                        <img id="imgPreview" class="image-preview" src="" alt="Aperçu">
+                        <span id="previewText" style="font-size: 0.8rem; color: #888; display: none;">Photo sélectionnée</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="btnSave">Enregistrer le produit</button>
+            </form>
         </div>
 
-        <!-- Barre de Formule -->
-        <div class="formula-bar">
-            <span class="cell-address">A1</span>
-            <span class="fx-symbol">fx</span>
-            <input type="text" class="formula-input" value="=SOMME(COMMANDES_FOURNISSEURS_TSHIMUNYI)" readonly>
-        </div>
+        <!-- Liste des Produits -->
+        <div id="productList"></div>
 
-        <!-- Grille Style Feuille de Calcul (Modèle Réel) -->
-        <div class="sheet-container">
-            <table class="excel-table" id="commandeTable">
-                <thead>
-                    <!-- Ligne d'en-tête Excel A, B, C... -->
-                    <tr>
-                        <th class="col-header"></th>
-                        <th class="col-header">A</th>
-                        <th class="col-header">B</th>
-                        <th class="col-header">C</th>
-                        <th class="col-header">D</th>
-                        <th class="col-header">E</th>
-                        <th class="col-header">F</th>
-                        <th class="col-header">G</th>
-                        <th class="col-header">H</th>
-                    </tr>
-                    <!-- Titre Principal de la Grille -->
-                    <tr>
-                        <td class="row-header">1</td>
-                        <td colspan="8" class="header-block">
-                            ÉTABLISSEMENT TSHIMUNYI — SUIVI DES COMMANDES PASSÉES CHEZ LES FOURNISSEURS
-                        </td>
-                    </tr>
-                    <!-- Sous-en-têtes de colonnes colorées -->
-                    <tr class="sub-header-yellow">
-                        <td class="row-header">2</td>
-                        <td>N° Commande</td>
-                        <td>Fournisseur</td>
-                        <td>Désignation Produit / Article</td>
-                        <td>Qté Commandée</td>
-                        <td>Prix Unitaire ($)</td>
-                        <td>Montant Total ($)</td>
-                        <td>Statut Commande</td>
-                        <td>Actions</td>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <!-- Données chargées dynamiquement -->
-                </tbody>
-                <tfoot>
-                    <tr class="sub-header-green">
-                        <td class="row-header">Σ</td>
-                        <td colspan="4" style="text-align: right;"><b>TOTAL GÉNÉRAL DES COMMANDES :</b></td>
-                        <td id="totalMontant" colspan="3" style="font-size:0.9rem; font-weight:bold;">0.00 $</td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
+    </div>
 
-        <!-- Bas de page Excel (Onglets) -->
-        <div class="sheet-tabs">
-            <div class="sheet-tab">Feuil1 - Commandes Fournisseurs</div>
-        </div>
+    <!-- Modal Grand Format Image -->
+    <div class="modal" id="imageModal" onclick="closeModal()">
+        <img id="modalImg" src="" alt="Agrandissement">
     </div>
 
     <script>
-        // --- GESTION DU MOT DE PASSE ADMIN ---
-        function authentifier() {
-            const pwd = document.getElementById('adminPassword').value;
-            if (pwd === 'Forever') {
-                document.getElementById('login-screen').style.display = 'none';
-            } else {
-                document.getElementById('errorMsg').style.display = 'block';
+        const ADMIN_PASS = "salva123";
+        let isAdmin = false;
+        let products = JSON.parse(localStorage.getItem("salvatore_products_v2")) || [];
+
+        function renderProducts(items = products) {
+            const listContainer = document.getElementById("productList");
+            listContainer.innerHTML = "";
+
+            if (items.length === 0) {
+                listContainer.innerHTML = '<p class="empty-msg">Aucun produit disponible dans le catalogue.</p>';
+                return;
             }
-        }
 
-        function checkEnter(e) {
-            if (e.key === 'Enter') {
-                authentifier();
-            }
-        }
-
-        // Base de données des commandes chez les fournisseurs
-        let commandes = JSON.parse(localStorage.getItem('TSHIMUNYI_COMMANDES')) || [
-            { id: 101, num: 'CMD-2026-001', fournisseur: 'SOCIETE PLASTIQUE RDC', produit: 'Emballages Sachets 1L', qte: 500, pu: 0.20, statut: 'Envoyée' },
-            { id: 102, num: 'CMD-2026-002', fournisseur: 'AFRICA CONTAINERS', produit: 'Bidons Vides 5L', qte: 200, pu: 1.50, statut: 'Reçue' },
-            { id: 103, num: 'CMD-2026-003', fournisseur: 'LOGISTIQUE KATANGA', produit: 'Palettes en Bois', qte: 50, pu: 12.00, statut: 'En Attente' }
-        ];
-
-        function afficherCommandes() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            let total = 0;
-
-            commandes.forEach((cmd, index) => {
-                const totalLigne = cmd.qte * cmd.pu;
-                total += totalLigne;
-
-                let badgeClass = 'badge-pending';
-                if(cmd.statut === 'Envoyée') badgeClass = 'badge-sent';
-                if(cmd.statut === 'Reçue') badgeClass = 'badge-received';
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="row-header">${index + 3}</td>
-                    <td><b>${cmd.num}</b></td>
-                    <td>${cmd.fournisseur}</td>
-                    <td>${cmd.produit}</td>
-                    <td><b>${cmd.qte}</b></td>
-                    <td>${cmd.pu.toFixed(2)} $</td>
-                    <td><b>${totalLigne.toFixed(2)} $</b></td>
-                    <td><span class="badge ${badgeClass}">${cmd.statut}</span></td>
-                    <td>
-                        <button onclick="changerStatut(${cmd.id})" style="font-size:0.7rem; padding: 2px 5px; cursor:pointer;">🔄 Statut</button>
-                        <button onclick="supprimerCommande(${cmd.id})" style="font-size:0.7rem; padding: 2px 5px; color:red; cursor:pointer;">❌</button>
-                    </td>
+            items.forEach((product) => {
+                const originalIndex = products.indexOf(product);
+                const card = document.createElement("div");
+                card.className = `product-card ${isAdmin ? 'admin-only' : ''}`;
+                
+                let imgHtml = `<div class="product-img">📦</div>`;
+                if (product.image) {
+                    imgHtml = `
+                        <div class="product-img" onclick="openModal('${product.image}')" style="cursor: pointer;">
+                            <img src="${product.image}" alt="${escapeHtml(product.name)}">
+                        </div>
+                    `;
+                }
+                
+                card.innerHTML = `
+                    ${imgHtml}
+                    <div class="product-details">
+                        <div class="product-header">
+                            <span class="product-title">${escapeHtml(product.name)}</span>
+                            <span class="product-price">${escapeHtml(product.price)}</span>
+                        </div>
+                        <div class="product-desc">${escapeHtml(product.detail || 'Aucun détail spécifié')}</div>
+                        <div class="admin-actions">
+                            <button class="btn-action btn-edit" onclick="editProduct(${originalIndex})">Modifier</button>
+                            <button class="btn-action btn-delete" onclick="deleteProduct(${originalIndex})">Supprimer</button>
+                        </div>
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                listContainer.appendChild(card);
             });
-
-            document.getElementById('totalMontant').innerText = total.toFixed(2) + ' $';
-            localStorage.setItem('TSHIMUNYI_COMMANDES', JSON.stringify(commandes));
         }
 
-        function ajouterCommande() {
-            const fournisseur = prompt("Nom du Fournisseur :");
-            if (!fournisseur) return;
-            const produit = prompt("Désignation du Produit :");
-            const qte = parseInt(prompt("Quantité à commander :") || "0");
-            const pu = parseFloat(prompt("Prix Unitaire en ($) :") || "0");
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement("canvas");
+                        const ctx = canvas.getContext("2d");
+                        
+                        let width = img.width;
+                        let height = img.height;
+                        const maxDim = 400;
 
-            const nouvelleCmd = {
-                id: Date.now(),
-                num: 'CMD-2026-00' + (commandes.length + 1),
-                fournisseur,
-                produit,
-                qte,
-                pu,
-                statut: 'En Attente'
-            };
+                        if (width > height) {
+                            if (width > maxDim) {
+                                height *= maxDim / width;
+                                width = maxDim;
+                            }
+                        } else {
+                            if (height > maxDim) {
+                                width *= maxDim / height;
+                                height = maxDim;
+                            }
+                        }
 
-            commandes.push(nouvelleCmd);
-            afficherCommandes();
-        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
 
-        function changerStatut(id) {
-            const cmd = commandes.find(c => c.id === id);
-            if (!cmd) return;
-
-            if (cmd.statut === 'En Attente') cmd.statut = 'Envoyée';
-            else if (cmd.statut === 'Envoyée') cmd.statut = 'Reçue';
-            else cmd.statut = 'En Attente';
-
-            afficherCommandes();
-        }
-
-        function supprimerCommande(id) {
-            if (confirm("Supprimer cette commande de l'Établissement Tshimunyi ?")) {
-                commandes = commandes.filter(c => c.id !== id);
-                afficherCommandes();
+                        const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.7);
+                        
+                        document.getElementById("productImageData").value = compressedDataUrl;
+                        const preview = document.getElementById("imgPreview");
+                        preview.src = compressedDataUrl;
+                        preview.style.display = "block";
+                        document.getElementById("previewText").style.display = "inline";
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
             }
         }
 
-        function filtrerTable() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const rows = document.querySelectorAll('#tableBody tr');
-            rows.forEach(row => {
-                row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
-            });
+        function toggleAdmin() {
+            if (!isAdmin) {
+                const pass = prompt("Entrez le mot de passe administrateur :");
+                if (pass === ADMIN_PASS) {
+                    isAdmin = true;
+                    document.getElementById("adminToggleBtn").innerText = "🔓 Admin (Actif)";
+                    document.getElementById("adminPanel").classList.add("active");
+                } else if (pass !== null) {
+                    alert("Mot de passe incorrect !");
+                }
+            } else {
+                isAdmin = false;
+                document.getElementById("adminToggleBtn").innerText = "🔒 Admin";
+                document.getElementById("adminPanel").classList.remove("active");
+                resetForm();
+            }
+            renderProducts();
         }
 
-        function exporterExcel() {
-            let csv = 'Numero;Fournisseur;Produit;Quantite;Prix Unitaire;Total;Statut\n';
-            commandes.forEach(c => {
-                csv += `${c.num};${c.fournisseur};${c.produit};${c.qte};${c.pu};${(c.qte*c.pu).toFixed(2)};${c.statut}\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `Commandes_Tshimunyi_${new Date().toISOString().slice(0,10)}.csv`;
-            link.click();
+        function saveProduct(event) {
+            event.preventDefault();
+            if (!isAdmin) return;
+
+            const id = document.getElementById("productId").value;
+            const name = document.getElementById("productName").value.trim();
+            const price = document.getElementById("productPrice").value.trim();
+            const detail = document.getElementById("productDetail").value.trim();
+            const image = document.getElementById("productImageData").value;
+
+            try {
+                if (id === "") {
+                    products.unshift({ name, price, detail, image });
+                } else {
+                    products[id] = { name, price, detail, image };
+                }
+
+                localStorage.setItem("salvatore_products_v2", JSON.stringify(products));
+                resetForm();
+                renderProducts();
+            } catch (e) {
+                alert("Erreur d'enregistrement ! L'image est peut-être trop lourde pour le stockage local.");
+            }
         }
 
-        function calculerTotal() {
-            afficherCommandes();
-            alert("Totaux recalculés avec succès !");
+        function editProduct(index) {
+            if (!isAdmin) return;
+            const product = products[index];
+            document.getElementById("productId").value = index;
+            document.getElementById("productName").value = product.name;
+            document.getElementById("productPrice").value = product.price;
+            document.getElementById("productDetail").value = product.detail || "";
+            document.getElementById("productImageData").value = product.image || "";
+            
+            const preview = document.getElementById("imgPreview");
+            if (product.image) {
+                preview.src = product.image;
+                preview.style.display = "block";
+                document.getElementById("previewText").style.display = "inline";
+            } else {
+                preview.style.display = "none";
+                document.getElementById("previewText").style.display = "none";
+            }
+
+            document.getElementById("formTitle").innerText = "Modifier le produit";
+            document.getElementById("btnSave").innerText = "Mettre à jour le produit";
+            document.getElementById("btnCancel").style.display = "inline-block";
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Chargement initial
-        afficherCommandes();
+        function deleteProduct(index) {
+            if (!isAdmin) return;
+            if (confirm("Voulez-vous vraiment supprimer ce produit ?")) {
+                products.splice(index, 1);
+                localStorage.setItem("salvatore_products_v2", JSON.stringify(products));
+                renderProducts();
+            }
+        }
+
+        function filterProducts() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            const filtered = products.filter(p => 
+                p.name.toLowerCase().includes(query) || 
+                (p.detail && p.detail.toLowerCase().includes(query))
+            );
+            renderProducts(filtered);
+        }
+
+        function resetForm() {
+            document.getElementById("productId").value = "";
+            document.getElementById("productImageData").value = "";
+            document.getElementById("productForm").reset();
+            document.getElementById("imgPreview").style.display = "none";
+            document.getElementById("previewText").style.display = "none";
+            document.getElementById("formTitle").innerText = "Ajouter un produit";
+            document.getElementById("btnSave").innerText = "Enregistrer le produit";
+            document.getElementById("btnCancel").style.display = "none";
+        }
+
+        function openModal(imgSrc) {
+            document.getElementById("modalImg").src = imgSrc;
+            document.getElementById("imageModal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("imageModal").style.display = "none";
+        }
+
+        function escapeHtml(str) {
+            if (!str) return "";
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        }
+
+        renderProducts();
     </script>
 </body>
 </html>
