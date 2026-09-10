@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CAMÉLÉON - Catalogue Sourcing Fournisseurs</title>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-glow: rgba(76, 175, 80, 0.4);
+            --bg-deep: #0a0a0f;
+            --surface: rgba(20, 20, 30, 0.85);
+            --surface-card: rgba(30, 30, 45, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --danger: #ff5252;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            padding-bottom: 90px;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(20,20,30,0.9), var(--surface));
+            border-bottom: 1px solid var(--border);
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #fff;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        header p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            flex: 1;
+        }
+
+        /* Panneau de saisie Fournisseur / Marchandise */
+        .sourcing-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+        }
+
+        /* Input de fichier personnalisé */
+        .file-upload-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload-btn {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px dashed var(--border);
+            color: var(--text-muted);
+            padding: 14px;
+            border-radius: 12px;
+            text-align: center;
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload-btn:hover {
+            border-color: var(--primary);
+            color: var(--text-main);
+        }
+
+        .file-upload-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .btn-action {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
+
+        .btn-action:active {
+            transform: scale(0.98);
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Grille des articles fournisseurs */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        @media (max-width: 400px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .product-card {
+            background: var(--surface-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            position: relative;
+        }
+
+        .product-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .product-img-box {
+            width: 100%;
+            height: 140px;
+            background: #15151f;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .product-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .product-supplier {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .product-price {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-top: 4px;
+        }
+
+        .product-footer {
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-delete-card {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .btn-delete-card:hover {
+            opacity: 1;
+        }
+
+        .empty-state {
+            grid-column: span 2;
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Navigation inférieure fixe */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(12, 12, 18, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .nav-item {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.3s;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Sourcing Fournisseurs</h1>
+        <p>Caméléon Engine - Catalogue & Achats Futurs</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- Formulaire d'enregistrement marchandise -->
+        <div class="sourcing-card">
+            <div class="form-group">
+                <div>
+                    <label class="input-label">Nom du Produit / Marchandise</label>
+                    <input type="text" id="prod-name" class="input-field" placeholder="Ex: Écran OLED, Lot de câbles...">
+                </div>
+                <div>
+                    <label class="input-label">Nom du Fournisseur / Boutique</label>
+                    <input type="text" id="prod-supplier" class="input-field" placeholder="Ex: JBK Le Pro, Boutique Centre...">
+                </div>
+                <div>
+                    <label class="input-label">Prix estimé</label>
+                    <input type="text" id="prod-price" class="input-field" placeholder="Ex: 45 $">
+                </div>
+                <div>
+                    <label class="input-label">Photo du produit</label>
+                    <div class="file-upload-wrapper">
+                        <span class="file-upload-btn" id="file-label">📸 Choisir une photo ou capturer</span>
+                        <input type="file" id="prod-file" accept="image/*" onchange="updateFileName(this)">
+                    </div>
+                </div>
+                <button class="btn-action" onclick="addProduct()">Ajouter au catalogue</button>
+            </div>
+        </div>
+
+        <!-- Grille des articles trouvés -->
+        <div class="section-title">
+            <span>Marchandises Repérées</span>
+            <span id="product-counter" style="font-size: 0.8rem; color: var(--text-muted);">0 article</span>
+        </div>
+
+        <div class="products-grid" id="products-container">
+            <!-- Inséré dynamiquement -->
+        </div>
+
+    </div>
+
+    <!-- Barre de Navigation Inférieure -->
+    <nav class="bottom-nav">
+        <a href="objectifs.html" class="nav-item">
+            <span class="nav-icon">🎯</span>
+            <span>Objectifs</span>
+        </a>
+        <a href="finances.html" class="nav-item">
+            <span class="nav-icon">💰</span>
+            <span>Finances</span>
+        </a>
+        <a href="fournisseurs.html" class="nav-item active">
+            <span class="nav-icon">📦</span>
+            <span>Fournisseurs</span>
+        </a>
+        <a href="index.html" class="nav-item">
+            <span class="nav-icon">🎨</span>
+            <span>Caméléon</span>
+        </a>
+    </nav>
+
+    <script>
+        // Application dynamique de la couleur Caméléon
+        const savedColor = localStorage.getItem('cameleon_color') || '#4CAF50';
+        const savedRgb = localStorage.getItem('cameleon_rgb') || '76, 175, 80';
+
+        document.documentElement.style.setProperty('--primary', savedColor);
+        document.documentElement.style.setProperty('--primary-glow', `rgba(${savedRgb}, 0.4)`);
+
+        function updateFileName(input) {
+            const label = document.getElementById('file-label');
+            if (input.files && input.files[0]) {
+                label.textContent = "✓ " + input.files[0].name;
+                label.style.borderColor = savedColor;
+                label.style.color = savedColor;
+            } else {
+                label.textContent = "📸 Choisir une photo ou capturer";
+            }
+        }
+
+        function addProduct() {
+            const nameInput = document.getElementById('prod-name');
+            const supplierInput = document.getElementById('prod-supplier');
+            const priceInput = document.getElementById('prod-price');
+            const fileInput = document.getElementById('prod-file');
+
+            const name = nameInput.value.trim();
+            const supplier = supplierInput.value.trim();
+            const price = priceInput.value.trim();
+
+            if (!name || !supplier || !price || fileInput.files.length === 0) {
+                alert("Veuillez remplir tous les champs et joindre une photo de la marchandise.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageBase64 = e.target.result;
+                let products = JSON.parse(localStorage.getItem('cameleon_products') || '[]');
+
+                products.push({
+                    id: Date.now(),
+                    name: name,
+                    supplier: supplier,
+                    price: price,
+                    image: imageBase64,
+                    date: new Date().toLocaleDateString()
+                });
+
+                localStorage.setItem('cameleon_products', JSON.stringify(products));
+
+                // Réinitialisation du formulaire
+                nameInput.value = '';
+                supplierInput.value = '';
+                priceInput.value = '';
+                fileInput.value = '';
+                document.getElementById('file-label').textContent = "📸 Choisir une photo ou capturer";
+                document.getElementById('file-label').style.borderColor = "var(--border)";
+                document.getElementById('file-label').style.color = "var(--text-muted)";
+
+                renderProducts();
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        function deleteProduct(id) {
+            let products = JSON.parse(localStorage.getItem('cameleon_products') || '[]');
+            products = products.filter(p => p.id !== id);
+            localStorage.setItem('cameleon_products', JSON.stringify(products));
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('products-container');
+            let products = JSON.parse(localStorage.getItem('cameleon_products') || '[]');
+
+            container.innerHTML = '';
+
+            if (products.length === 0) {
+                container.innerHTML = `<div class="empty-state">Aucune marchandise en sourcing pour l'instant.</div>`;
+                document.getElementById('product-counter').textContent = '0 article';
+                return;
+            }
+
+            products.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <div class="product-img-box">
+                        <img src="${p.image}" alt="${escapeHtml(p.name)}">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-title">${escapeHtml(p.name)}</div>
+                        <div class="product-supplier">🏪 ${escapeHtml(p.supplier)}</div>
+                        <div class="product-price">${escapeHtml(p.price)}</div>
+                    </div>
+                    <div class="product-footer">
+                        <button class="btn-delete-card" onclick="deleteProduct(${p.id})" title="Supprimer">Supprimer 🗑️</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            document.getElementById('product-counter').textContent = products.length + (products.length > 1 ? ' articles' : ' article');
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        // Lancement initial
+        renderProducts();
+    </script>
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CAMÉLÉON - Gestion Financière & Trésorerie</title>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-glow: rgba(76, 175, 80, 0.4);
+            --bg-deep: #0a0a0f;
+            --surface: rgba(20, 20, 30, 0.85);
+            --surface-card: rgba(30, 30, 45, 0.6);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --danger: #ff5252;
+            --success: #4CAF50;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            padding-bottom: 90px;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(20,20,30,0.9), var(--surface));
+            border-bottom: 1px solid var(--border);
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #fff;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        header p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            flex: 1;
+        }
+
+        /* Cartes de synthèse financière */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            backdrop-filter: blur(15px);
+        }
+
+        .metric-title {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .metric-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        /* Panneau de formulaire */
+        .finance-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-action {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
+
+        .btn-action:active {
+            transform: scale(0.98);
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Liste des transactions et dépenses */
+        .expenses-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .expense-item {
+            background: var(--surface-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .expense-item.paid {
+            opacity: 0.55;
+            border-color: rgba(255,255,255,0.03);
+        }
+
+        .expense-info h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+
+        .expense-info p {
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .expense-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-ok {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .expense-item.paid .btn-ok {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 4px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .btn-delete:hover {
+            opacity: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Navigation inférieure fixe */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(12, 12, 18, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .nav-item {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.3s;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Gestion Financière</h1>
+        <p>Caméléon Engine - Trésorerie & Dépenses</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- Indicateurs de synthèses -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-title">Total Prévu</div>
+                <div class="metric-value" id="total-amount">0.00</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Reste à Régler</div>
+                <div class="metric-value" id="remaining-amount" style="color: var(--danger);">0.00</div>
+            </div>
+        </div>
+
+        <!-- Formulaire d'ajout de dépense -->
+        <div class="finance-card">
+            <div class="form-group">
+                <div>
+                    <label class="input-label">Intitulé de la dépense</label>
+                    <input type="text" id="expense-title" class="input-field" placeholder="Ex: Achat équipement, transport...">
+                </div>
+                <div>
+                    <label class="input-label">Montant estimé</label>
+                    <input type="number" id="expense-amount" class="input-field" placeholder="Ex: 150">
+                </div>
+                <button class="btn-action" onclick="addExpense()">Enregistrer la dépense</button>
+            </div>
+        </div>
+
+        <!-- Liste des dépenses -->
+        <div class="section-title">
+            <span>Dépenses Planifiées</span>
+            <span id="expense-counter" style="font-size: 0.8rem; color: var(--text-muted);">0 élément</span>
+        </div>
+
+        <div class="expenses-list" id="expenses-container">
+            <!-- Inséré dynamiquement -->
+        </div>
+
+    </div>
+
+    <!-- Barre de Navigation Inférieure -->
+    <nav class="bottom-nav">
+        <a href="objectifs.html" class="nav-item">
+            <span class="nav-icon">🎯</span>
+            <span>Objectifs</span>
+        </a>
+        <a href="finances.html" class="nav-item active">
+            <span class="nav-icon">💰</span>
+            <span>Finances</span>
+        </a>
+        <a href="fournisseurs.html" class="nav-item">
+            <span class="nav-icon">📦</span>
+            <span>Fournisseurs</span>
+        </a>
+        <a href="index.html" class="nav-item">
+            <span class="nav-icon">🎨</span>
+            <span>Caméléon</span>
+        </a>
+    </nav>
+
+    <script>
+        // Application dynamique de la couleur Caméléon
+        const savedColor = localStorage.getItem('cameleon_color') || '#4CAF50';
+        const savedRgb = localStorage.getItem('cameleon_rgb') || '76, 175, 80';
+
+        document.documentElement.style.setProperty('--primary', savedColor);
+        document.documentElement.style.setProperty('--primary-glow', `rgba(${savedRgb}, 0.4)`);
+
+        function addExpense() {
+            const titleInput = document.getElementById('expense-title');
+            const amountInput = document.getElementById('expense-amount');
+            
+            const title = titleInput.value.trim();
+            const amount = parseFloat(amountInput.value);
+
+            if (!title || isNaN(amount) || amount <= 0) {
+                alert("Veuillez renseigner un intitulé valide et un montant correct.");
+                return;
+            }
+
+            let expenses = JSON.parse(localStorage.getItem('cameleon_expenses') || '[]');
+            
+            expenses.push({
+                id: Date.now(),
+                title: title,
+                amount: amount,
+                paid: false,
+                date: new Date().toLocaleDateString()
+            });
+
+            localStorage.setItem('cameleon_expenses', JSON.stringify(expenses));
+            
+            titleInput.value = '';
+            amountInput.value = '';
+            renderExpenses();
+        }
+
+        function togglePaid(id) {
+            let expenses = JSON.parse(localStorage.getItem('cameleon_expenses') || '[]');
+            
+            expenses = expenses.map(exp => {
+                if (exp.id === id) {
+                    exp.paid = !exp.paid;
+                }
+                return exp;
+            });
+
+            localStorage.setItem('cameleon_expenses', JSON.stringify(expenses));
+            renderExpenses();
+        }
+
+        function deleteExpense(id) {
+            let expenses = JSON.parse(localStorage.getItem('cameleon_expenses') || '[]');
+            expenses = expenses.filter(exp => exp.id !== id);
+            localStorage.setItem('cameleon_expenses', JSON.stringify(expenses));
+            renderExpenses();
+        }
+
+        function renderExpenses() {
+            const container = document.getElementById('expenses-container');
+            let expenses = JSON.parse(localStorage.getItem('cameleon_expenses') || '[]');
+
+            container.innerHTML = '';
+
+            if (expenses.length === 0) {
+                container.innerHTML = `<div class="empty-state">Aucune dépense enregistrée pour le moment.</div>`;
+                updateMetrics(expenses);
+                return;
+            }
+
+            expenses.forEach(exp => {
+                const item = document.createElement('div');
+                item.className = `expense-item ${exp.paid ? 'paid' : ''}`;
+                item.innerHTML = `
+                    <div class="expense-info">
+                        <h3>${escapeHtml(exp.title)}</h3>
+                        <p>${exp.amount.toLocaleString()} $</p>
+                    </div>
+                    <div class="expense-actions">
+                        <button class="btn-ok" onclick="togglePaid(${exp.id})">${exp.paid ? '✓ OK' : 'Marquer OK'}</button>
+                        <button class="btn-delete" onclick="deleteExpense(${exp.id})" title="Supprimer">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+
+            updateMetrics(expenses);
+        }
+
+        function updateMetrics(expenses) {
+            const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+            const remaining = expenses.filter(exp => !exp.paid).reduce((sum, exp) => sum + exp.amount, 0);
+
+            document.getElementById('total-amount').textContent = total.toLocaleString() + ' $';
+            document.getElementById('remaining-amount').textContent = remaining.toLocaleString() + ' $';
+            document.getElementById('expense-counter').textContent = expenses.length + (expenses.length > 1 ? ' éléments' : ' élément');
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        // Lancement initial
+        renderExpenses();
+    </script>
+</body>
+</html>

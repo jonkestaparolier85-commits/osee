@@ -1,587 +1,499 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme-color="#4CAF50">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salvatore Market - Catalogue & Prix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CAMÉLÉON - Master Edition</title>
     <style>
         :root {
-            --primary-color: #0d6efd;
-            --primary-hover: #0b5ed7;
-            --bg-color: #f4f6f9;
-            --card-bg: #ffffff;
-            --text-color: #212529;
-            --text-muted: #6c757d;
-            --border-color: #e9ecef;
-            --border-radius: 12px;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --primary: #4CAF50;
+            --primary-glow: rgba(76, 175, 80, 0.4);
+            --bg-deep: #0a0a0f;
+            --surface: rgba(20, 20, 30, 0.75);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding-bottom: 40px;
-        }
-
-        /* Header */
-        header {
-            background: linear-gradient(135deg, #0d6efd, #0a58ca);
-            color: white;
-            padding: 16px 20px;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-        }
-
-        header h1 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-        }
-
-        .btn-admin-toggle {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-admin-toggle:active {
-            background: rgba(255, 255, 255, 0.35);
-        }
-
-        /* Main Container */
-        .container {
-            padding: 16px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Search Box */
-        .search-box {
-            margin-bottom: 16px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #ced4da;
-            border-radius: var(--border-radius);
-            font-size: 0.95rem;
-            outline: none;
-            background-color: #fff;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .search-box input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
-        }
-
-        /* Admin Form */
-        .admin-panel {
-            background: var(--card-bg);
-            padding: 18px;
-            border-radius: var(--border-radius);
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-            display: none;
-        }
-
-        .admin-panel.active {
-            display: block;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .admin-panel h2 {
-            font-size: 1.05rem;
-            margin-bottom: 12px;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            outline: none;
-            background: #fff;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            height: 65px;
-        }
-
-        /* Preview container */
-        .image-preview-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 6px;
-        }
-
-        .image-preview {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 1px solid #ddd;
-            background-color: #f8f9fa;
-            display: none;
-        }
-
-        .btn-submit {
-            width: 100%;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            margin-top: 6px;
-            transition: background 0.2s;
-        }
-
-        .btn-submit:active {
-            background: var(--primary-hover);
-        }
-
-        .btn-cancel {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-
-        /* Product List */
-        .product-card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 14px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-            border: 1px solid var(--border-color);
-            display: flex;
-            gap: 14px;
-            align-items: center;
-        }
-
-        .product-img {
-            width: 75px;
-            height: 75px;
-            border-radius: 10px;
-            object-fit: cover;
-            background-color: #e9ecef;
-            flex-shrink: 0;
-            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #adb5bd;
-            font-size: 1.8rem;
+            overflow-x: hidden;
+            position: relative;
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Toile de fond pour les particules dynamiques du Caméléon */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .app-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 440px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 24px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .brand-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #fff 30%, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            text-shadow: 0 0 30px var(--primary-glow);
+            transition: all 0.5s ease;
+        }
+
+        .brand-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .viewfinder-card {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 16px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--primary-glow);
+            transition: box-shadow 0.5s ease, border-color 0.5s ease;
+            margin-bottom: 24px;
+            position: relative;
             overflow: hidden;
         }
 
-        .product-img img {
+        .viewfinder-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            animation: scanline 3s linear infinite;
+        }
+
+        .viewport {
+            width: 100%;
+            height: 320px;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        video, img, canvas#snapshot-canvas {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
-        .product-details {
-            flex-grow: 1;
-            min-width: 0;
-        }
-
-        .product-header {
+        .reticle {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: pulse-reticle 2s infinite ease-in-out;
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 8px;
-            margin-bottom: 4px;
+            align-items: center;
+            justify-content: center;
         }
 
-        .product-title {
+        .reticle::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .color-readout {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .color-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .color-chip {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 12px var(--primary);
+            transition: background 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        .color-text span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .color-text strong {
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+        }
+
+        .action-stack {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 16px;
+            border: none;
             font-size: 1rem;
             font-weight: 700;
-            color: var(--text-color);
-            word-wrap: break-word;
-        }
-
-        .product-price {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: #198754;
-            white-space: nowrap;
-        }
-
-        .product-desc {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.35;
-            word-wrap: break-word;
-        }
-
-        .admin-actions {
-            margin-top: 8px;
-            display: none;
-            gap: 8px;
-        }
-
-        .admin-only .admin-actions {
-            display: flex;
-        }
-
-        .btn-action {
-            padding: 5px 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.78rem;
-            font-weight: 600;
             cursor: pointer;
-        }
-
-        .btn-edit { background: #ffc107; color: #000; }
-        .btn-delete { background: #dc3545; color: #fff; }
-
-        .empty-msg {
-            text-align: center;
-            color: var(--text-muted);
-            margin-top: 40px;
-            font-size: 0.95rem;
-        }
-
-        /* Responsive image popup */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 200;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.85);
-            justify-content: center;
+            display: flex;
             align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .modal img {
-            max-width: 90%;
-            max-height: 80%;
-            border-radius: 8px;
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 8px 25px var(--primary-glow);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modules-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .mod-pill {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(320%); }
+        }
+
+        @keyframes pulse-reticle {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.05); opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Salvatore Market 🛒</h1>
-        <button class="btn-admin-toggle" id="adminToggleBtn" onclick="toggleAdmin()">🔒 Admin</button>
-    </header>
+    <canvas id="particle-canvas"></canvas>
 
-    <div class="container">
-        
-        <!-- Recherche -->
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Rechercher un produit..." oninput="filterProducts()">
+    <div class="app-wrapper">
+        <div class="brand-header">
+            <h1 id="brand-title">Caméléon</h1>
+            <p>Adaptive Neural Interface</p>
         </div>
 
-        <!-- Panneau d'administration -->
-        <div class="admin-panel" id="adminPanel">
-            <h2>
-                <span id="formTitle">Ajouter un produit</span>
-                <button type="button" class="btn-cancel" id="btnCancel" onclick="resetForm()" style="display:none;">Annuler</button>
-            </h2>
-            <form id="productForm" onsubmit="saveProduct(event)">
-                <input type="hidden" id="productId">
-                <input type="hidden" id="productImageData">
-                
-                <div class="form-group">
-                    <label for="productName">Nom du produit *</label>
-                    <input type="text" id="productName" placeholder="Ex: Huile d'olive 1L" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="productPrice">Prix *</label>
-                    <input type="text" id="productPrice" placeholder="Ex: 5000 FC ou 2.5 $" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="productDetail">Détails / Description</label>
-                    <textarea id="productDetail" placeholder="Ex: Marque Salvatore, extra vierge, provenance..."></textarea>
-                </div>
+        <div class="viewfinder-card" id="card-border">
+            <div class="viewport">
+                <video id="video" autoplay playsinline muted></video>
+                <canvas id="snapshot-canvas" style="display:none;"></canvas>
+                <img id="preview-img" style="display:none;" alt="Capture Caméléon">
+                <div class="reticle"></div>
+            </div>
 
-                <div class="form-group">
-                    <label for="productImage">Photo du produit</label>
-                    <input type="file" id="productImage" accept="image/*" onchange="handleImageUpload(event)">
-                    <div class="image-preview-container">
-                        <img id="imgPreview" class="image-preview" src="" alt="Aperçu">
-                        <span id="previewText" style="font-size: 0.8rem; color: #888; display: none;">Photo sélectionnée</span>
+            <div class="color-readout">
+                <div class="color-info">
+                    <div class="color-chip" id="color-chip"></div>
+                    <div class="color-text">
+                        <span>Fréquence Chromatique</span>
+                        <strong id="hex-code">#4CAF50</strong>
                     </div>
                 </div>
-
-                <button type="submit" class="btn-submit" id="btnSave">Enregistrer le produit</button>
-            </form>
+                <div id="status-badge" style="font-size:0.8rem; color:var(--primary); font-weight:bold;">EN LIGNE</div>
+            </div>
         </div>
 
-        <!-- Liste des Produits -->
-        <div id="productList"></div>
+        <div class="action-stack">
+            <button id="capture-btn" class="btn btn-primary">
+                <span>Capturer & Adapter</span>
+            </button>
+            <button id="switch-cam-btn" class="btn btn-secondary">
+                <span>Changer de Caméra</span>
+            </button>
+            <button id="proceed-btn" class="btn btn-primary" style="display:none; margin-top:5px;">
+                <span>Entrer dans l'Application</span>
+            </button>
+        </div>
 
-    </div>
-
-    <!-- Modal Grand Format Image -->
-    <div class="modal" id="imageModal" onclick="closeModal()">
-        <img id="modalImg" src="" alt="Agrandissement">
+        <div class="modules-preview">
+            <div class="mod-pill">🎯 Objectifs</div>
+            <div class="mod-pill">💰 Finances</div>
+            <div class="mod-pill">📦 Fournisseurs</div>
+        </div>
     </div>
 
     <script>
-        const ADMIN_PASS = "salva123";
-        let isAdmin = false;
-        let products = JSON.parse(localStorage.getItem("salvatore_products_v2")) || [];
+        const video = document.getElementById('video');
+        const snapshotCanvas = document.getElementById('snapshot-canvas');
+        const previewImg = document.getElementById('preview-img');
+        const captureBtn = document.getElementById('capture-btn');
+        const switchCamBtn = document.getElementById('switch-cam-btn');
+        const proceedBtn = document.getElementById('proceed-btn');
+        const colorChip = document.getElementById('color-chip');
+        const hexCode = document.getElementById('hex-code');
+        const brandTitle = document.getElementById('brand-title');
+        const cardBorder = document.getElementById('card-border');
 
-        function renderProducts(items = products) {
-            const listContainer = document.getElementById("productList");
-            listContainer.innerHTML = "";
+        let useFrontCamera = false;
+        let currentStream = null;
+        let isCaptured = false;
 
-            if (items.length === 0) {
-                listContainer.innerHTML = '<p class="empty-msg">Aucun produit disponible dans le catalogue.</p>';
-                return;
+        // Gestionnaire de flux vidéo robuste avec gestion des erreurs de permissions
+        async function initCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
             }
-
-            items.forEach((product) => {
-                const originalIndex = products.indexOf(product);
-                const card = document.createElement("div");
-                card.className = `product-card ${isAdmin ? 'admin-only' : ''}`;
-                
-                let imgHtml = `<div class="product-img">📦</div>`;
-                if (product.image) {
-                    imgHtml = `
-                        <div class="product-img" onclick="openModal('${product.image}')" style="cursor: pointer;">
-                            <img src="${product.image}" alt="${escapeHtml(product.name)}">
-                        </div>
-                    `;
+            const constraints = {
+                video: {
+                    facingMode: useFrontCamera ? 'user' : 'environment',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
                 }
-                
-                card.innerHTML = `
-                    ${imgHtml}
-                    <div class="product-details">
-                        <div class="product-header">
-                            <span class="product-title">${escapeHtml(product.name)}</span>
-                            <span class="product-price">${escapeHtml(product.price)}</span>
-                        </div>
-                        <div class="product-desc">${escapeHtml(product.detail || 'Aucun détail spécifié')}</div>
-                        <div class="admin-actions">
-                            <button class="btn-action btn-edit" onclick="editProduct(${originalIndex})">Modifier</button>
-                            <button class="btn-action btn-delete" onclick="deleteProduct(${originalIndex})">Supprimer</button>
-                        </div>
-                    </div>
-                `;
-                listContainer.appendChild(card);
+            };
+            try {
+                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = currentStream;
+            } catch (err) {
+                console.warn("Caméra principale introuvable, basculement en mode standard...", err);
+                try {
+                    currentStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    video.srcObject = currentStream;
+                } catch (e) {
+                    alert("Accès à la caméra requis pour l'effet Caméléon.");
+                }
+            }
+        }
+
+        initCamera();
+
+        switchCamBtn.addEventListener('click', () => {
+            useFrontCamera = !useFrontCamera;
+            initCamera();
+        });
+
+        // Algorithme d'extraction de couleur dominante optimisé
+        captureBtn.addEventListener('click', () => {
+            if (!isCaptured) {
+                snapshotCanvas.width = video.videoWidth || 640;
+                snapshotCanvas.height = video.videoHeight || 480;
+                const ctx = snapshotCanvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+
+                const dataURL = snapshotCanvas.toDataURL('image/png');
+                previewImg.src = dataURL;
+                previewImg.style.display = 'block';
+                video.style.display = 'none';
+
+                // Échantillonnage intelligent de la zone centrale
+                const imgData = ctx.getImageData(
+                    snapshotCanvas.width * 0.25, 
+                    snapshotCanvas.height * 0.25, 
+                    snapshotCanvas.width * 0.5, 
+                    snapshotCanvas.height * 0.5
+                ).data;
+
+                let r = 0, g = 0, b = 0, count = 0;
+                for (let i = 0; i < imgData.length; i += 16) {
+                    r += imgData[i];
+                    g += imgData[i + 1];
+                    b += imgData[i + 2];
+                    count++;
+                }
+
+                r = Math.floor(r / count);
+                g = Math.floor(g / count);
+                b = Math.floor(b / count);
+
+                const hex = rgbToHex(r, g, b);
+                applyChameleonTheme(r, g, b, hex);
+
+                captureBtn.innerHTML = "<span>Reprendre la photo</span>";
+                proceedBtn.style.display = 'flex';
+                switchCamBtn.style.display = 'none';
+                isCaptured = true;
+            } else {
+                // Réinitialisation
+                previewImg.style.display = 'none';
+                video.style.display = 'block';
+                captureBtn.innerHTML = "<span>Capturer & Adapter</span>";
+                proceedBtn.style.display = 'none';
+                switchCamBtn.style.display = 'flex';
+                isCaptured = false;
+            }
+        });
+
+        function rgbToHex(r, g, b) {
+            return "#" + [r, g, b].map(x => {
+                const hex = x.toString(16);
+                return hex.length === 1 ? "0" + hex : hex;
+            }).join('').toUpperCase();
+        }
+
+        function applyChameleonTheme(r, g, b, hex) {
+            const rgbString = `${r}, ${g}, ${b}`;
+            const glowColor = `rgba(${rgbString}, 0.4)`;
+
+            document.documentElement.style.setProperty('--primary', hex);
+            document.documentElement.style.setProperty('--primary-glow', glowColor);
+            
+            colorChip.style.background = hex;
+            colorChip.style.boxShadow = `0 0 15px ${hex}`;
+            hexCode.textContent = hex;
+            cardBorder.style.borderColor = hex;
+            cardBorder.style.boxShadow = `0 20px 40px rgba(0,0,0,0.5), 0 0 25px ${glowColor}`;
+
+            // Sauvegarde globale pour objectifs.html, finances.html, fournisseurs.html
+            localStorage.setItem('cameleon_color', hex);
+            localStorage.setItem('cameleon_rgb', rgbString);
+        }
+
+        proceedBtn.addEventListener('click', () => {
+            // Arrêt des flux caméras avant transition
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+            window.location.href = 'objectifs.html';
+        });
+
+        // Animation de particules d'arrière-plan interactives
+        const pCanvas = document.getElementById('particle-canvas');
+        const pCtx = pCanvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            pCanvas.width = window.innerWidth;
+            pCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        for (let i = 0; i < 25; i++) {
+            particles.push({
+                x: Math.random() * pCanvas.width,
+                y: Math.random() * pCanvas.height,
+                radius: Math.random() * 2 + 1,
+                speedX: (Math.random() - 0.5) * 0.5,
+                speedY: (Math.random() - 0.5) * 0.5
             });
         }
 
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement("canvas");
-                        const ctx = canvas.getContext("2d");
-                        
-                        let width = img.width;
-                        let height = img.height;
-                        const maxDim = 400;
+        function animateParticles() {
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+            pCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#4CAF50';
+            pCtx.globalAlpha = 0.25;
 
-                        if (width > height) {
-                            if (width > maxDim) {
-                                height *= maxDim / width;
-                                width = maxDim;
-                            }
-                        } else {
-                            if (height > maxDim) {
-                                width *= maxDim / height;
-                                height = maxDim;
-                            }
-                        }
+            particles.forEach(p => {
+                p.x += p.speedX;
+                p.y += p.speedY;
 
-                        canvas.width = width;
-                        canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
+                if (p.x < 0) p.x = pCanvas.width;
+                if (p.x > pCanvas.width) p.x = 0;
+                if (p.y < 0) p.y = pCanvas.height;
+                if (p.y > pCanvas.height) p.y = 0;
 
-                        const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.7);
-                        
-                        document.getElementById("productImageData").value = compressedDataUrl;
-                        const preview = document.getElementById("imgPreview");
-                        preview.src = compressedDataUrl;
-                        preview.style.display = "block";
-                        document.getElementById("previewText").style.display = "inline";
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
+                pCtx.beginPath();
+                pCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                pCtx.fill();
+            });
+            requestAnimationFrame(animateParticles);
         }
-
-        function toggleAdmin() {
-            if (!isAdmin) {
-                const pass = prompt("Entrez le mot de passe administrateur :");
-                if (pass === ADMIN_PASS) {
-                    isAdmin = true;
-                    document.getElementById("adminToggleBtn").innerText = "🔓 Admin (Actif)";
-                    document.getElementById("adminPanel").classList.add("active");
-                } else if (pass !== null) {
-                    alert("Mot de passe incorrect !");
-                }
-            } else {
-                isAdmin = false;
-                document.getElementById("adminToggleBtn").innerText = "🔒 Admin";
-                document.getElementById("adminPanel").classList.remove("active");
-                resetForm();
-            }
-            renderProducts();
-        }
-
-        function saveProduct(event) {
-            event.preventDefault();
-            if (!isAdmin) return;
-
-            const id = document.getElementById("productId").value;
-            const name = document.getElementById("productName").value.trim();
-            const price = document.getElementById("productPrice").value.trim();
-            const detail = document.getElementById("productDetail").value.trim();
-            const image = document.getElementById("productImageData").value;
-
-            try {
-                if (id === "") {
-                    products.unshift({ name, price, detail, image });
-                } else {
-                    products[id] = { name, price, detail, image };
-                }
-
-                localStorage.setItem("salvatore_products_v2", JSON.stringify(products));
-                resetForm();
-                renderProducts();
-            } catch (e) {
-                alert("Erreur d'enregistrement ! L'image est peut-être trop lourde pour le stockage local.");
-            }
-        }
-
-        function editProduct(index) {
-            if (!isAdmin) return;
-            const product = products[index];
-            document.getElementById("productId").value = index;
-            document.getElementById("productName").value = product.name;
-            document.getElementById("productPrice").value = product.price;
-            document.getElementById("productDetail").value = product.detail || "";
-            document.getElementById("productImageData").value = product.image || "";
-            
-            const preview = document.getElementById("imgPreview");
-            if (product.image) {
-                preview.src = product.image;
-                preview.style.display = "block";
-                document.getElementById("previewText").style.display = "inline";
-            } else {
-                preview.style.display = "none";
-                document.getElementById("previewText").style.display = "none";
-            }
-
-            document.getElementById("formTitle").innerText = "Modifier le produit";
-            document.getElementById("btnSave").innerText = "Mettre à jour le produit";
-            document.getElementById("btnCancel").style.display = "inline-block";
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function deleteProduct(index) {
-            if (!isAdmin) return;
-            if (confirm("Voulez-vous vraiment supprimer ce produit ?")) {
-                products.splice(index, 1);
-                localStorage.setItem("salvatore_products_v2", JSON.stringify(products));
-                renderProducts();
-            }
-        }
-
-        function filterProducts() {
-            const query = document.getElementById("searchInput").value.toLowerCase();
-            const filtered = products.filter(p => 
-                p.name.toLowerCase().includes(query) || 
-                (p.detail && p.detail.toLowerCase().includes(query))
-            );
-            renderProducts(filtered);
-        }
-
-        function resetForm() {
-            document.getElementById("productId").value = "";
-            document.getElementById("productImageData").value = "";
-            document.getElementById("productForm").reset();
-            document.getElementById("imgPreview").style.display = "none";
-            document.getElementById("previewText").style.display = "none";
-            document.getElementById("formTitle").innerText = "Ajouter un produit";
-            document.getElementById("btnSave").innerText = "Enregistrer le produit";
-            document.getElementById("btnCancel").style.display = "none";
-        }
-
-        function openModal(imgSrc) {
-            document.getElementById("modalImg").src = imgSrc;
-            document.getElementById("imageModal").style.display = "flex";
-        }
-
-        function closeModal() {
-            document.getElementById("imageModal").style.display = "none";
-        }
-
-        function escapeHtml(str) {
-            if (!str) return "";
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-        }
-
-        renderProducts();
+        animateParticles();
     </script>
 </body>
 </html>
