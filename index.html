@@ -1,499 +1,447 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme-color="#4CAF50">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CAMÉLÉON - Master Edition</title>
+    <title>Salvatore Market IA</title>
     <style>
         :root {
-            --primary: #4CAF50;
-            --primary-glow: rgba(76, 175, 80, 0.4);
-            --bg-deep: #0a0a0f;
-            --surface: rgba(20, 20, 30, 0.75);
-            --border: rgba(255, 255, 255, 0.1);
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
+            --red-main: #ff1e27;
+            --red-dark: #800003;
+            --red-glow: rgba(255, 30, 39, 0.5);
+            --bg-color: #0d0d0d;
+            --card-bg: #1a1a1a;
+            --text-color: #ffffff;
         }
 
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg-deep);
-            color: var(--text-main);
-            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        /* En-tête compact */
+        header {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        h1 span {
+            color: var(--red-main);
+        }
+
+        /* Section Centrale : L'ORBE VOCALE GEANTE */
+        .main-voice-section {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
-            position: relative;
-            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 20px;
         }
 
-        /* Toile de fond pour les particules dynamiques du Caméléon */
-        #particle-canvas {
+        .orb-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .voice-orb {
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--red-main) 0%, var(--red-dark) 100%);
+            box-shadow: 0 0 35px var(--red-glow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 3px solid #ffffff;
+        }
+
+        .voice-orb:active {
+            transform: scale(0.95);
+        }
+
+        .voice-orb.listening {
+            animation: pulse-red 1.2s infinite alternate;
+            background: radial-gradient(circle, #ffffff 0%, var(--red-main) 100%);
+        }
+
+        .voice-orb svg {
+            width: 65px;
+            height: 65px;
+            fill: #ffffff;
+        }
+
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 20px var(--red-main), 0 0 40px var(--red-main);
+                transform: scale(1);
+            }
+            100% {
+                box-shadow: 0 0 50px var(--red-main), 0 0 80px var(--red-main);
+                transform: scale(1.1);
+            }
+        }
+
+        .status-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #ccc;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .user-transcript {
+            font-size: 0.95rem;
+            color: var(--red-main);
+            text-align: center;
+            min-height: 24px;
+            font-style: italic;
+            padding: 0 20px;
+        }
+
+        /* Barre d'actions inférieure (Boutons flottants) */
+        .bottom-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 20px 25px 20px;
+            background-color: #141414;
+            border-top: 1px solid #222;
+        }
+
+        .action-btn {
+            background-color: var(--card-bg);
+            border: 1px solid #333;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .action-btn:active {
+            background-color: var(--red-main);
+        }
+
+        /* Modal (Panneau caché pour ajouter / voir les produits) */
+        .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .app-wrapper {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            max-width: 440px;
-            padding: 24px;
-            display: flex;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            justify-content: flex-end;
             flex-direction: column;
-            align-items: center;
         }
 
-        .brand-header {
-            text-align: center;
-            margin-bottom: 24px;
-            animation: fadeInDown 0.8s ease-out;
+        .modal-content {
+            background-color: var(--card-bg);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-top: 2px solid var(--red-main);
         }
 
-        .brand-header h1 {
-            font-size: 2.2rem;
-            font-weight: 800;
-            letter-spacing: 4px;
-            background: linear-gradient(135deg, #fff 30%, var(--primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-            text-shadow: 0 0 30px var(--primary-glow);
-            transition: all 0.5s ease;
-        }
-
-        .brand-header p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            letter-spacing: 0.5px;
-        }
-
-        .viewfinder-card {
-            width: 100%;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 28px;
-            padding: 16px;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--primary-glow);
-            transition: box-shadow 0.5s ease, border-color 0.5s ease;
-            margin-bottom: 24px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .viewfinder-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            animation: scanline 3s linear infinite;
-        }
-
-        .viewport {
-            width: 100%;
-            height: 320px;
-            border-radius: 20px;
-            overflow: hidden;
-            position: relative;
-            background: #000;
+        .modal-header {
             display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        video, img, canvas#snapshot-canvas {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        .reticle {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            border: 2px dashed rgba(255, 255, 255, 0.4);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: pulse-reticle 2s infinite ease-in-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .reticle::after {
-            content: '';
-            width: 6px;
-            height: 6px;
-            background: var(--primary);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--primary);
-        }
-
-        .color-readout {
-            display: flex;
-            align-items: center;
             justify-content: space-between;
-            margin-top: 16px;
-            padding: 12px 16px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 14px;
-            border: 1px solid var(--border);
-        }
-
-        .color-info {
-            display: flex;
             align-items: center;
-            gap: 12px;
+            margin-bottom: 20px;
         }
 
-        .color-chip {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: var(--primary);
-            box-shadow: 0 0 12px var(--primary);
-            transition: background 0.5s ease, box-shadow 0.5s ease;
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--red-main);
         }
 
-        .color-text span {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .color-text strong {
-            font-size: 0.95rem;
-            letter-spacing: 1px;
-        }
-
-        .action-stack {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 16px;
-            border-radius: 16px;
+        .close-btn {
+            background: none;
             border: none;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-primary {
-            background: var(--primary);
             color: #fff;
-            box-shadow: 0 8px 25px var(--primary-glow);
+            font-size: 1.5rem;
+            cursor: pointer;
         }
 
-        .btn-primary:active {
-            transform: scale(0.97);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .modules-preview {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+        /* Formulaire */
+        input {
             width: 100%;
-            margin-top: 20px;
+            padding: 14px;
+            margin-bottom: 12px;
+            background-color: #0d0d0d;
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
         }
 
-        .mod-pill {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 10px;
-            border-radius: 12px;
-            text-align: center;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            backdrop-filter: blur(10px);
+        input:focus {
+            outline: none;
+            border-color: var(--red-main);
         }
 
-        /* Animations */
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .save-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--red-main);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
         }
 
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(320%); }
+        /* Liste de produits */
+        .product-list {
+            margin-top: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+            border-top: 1px solid #333;
+            padding-top: 10px;
         }
 
-        @keyframes pulse-reticle {
-            0%, 100% { transform: scale(1); opacity: 0.6; }
-            50% { transform: scale(1.05); opacity: 1; }
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #222;
+            font-size: 0.95rem;
         }
     </style>
 </head>
 <body>
 
-    <canvas id="particle-canvas"></canvas>
+    <header>
+        <h1>Salvatore <span>Market IA</span></h1>
+    </header>
 
-    <div class="app-wrapper">
-        <div class="brand-header">
-            <h1 id="brand-title">Caméléon</h1>
-            <p>Adaptive Neural Interface</p>
-        </div>
-
-        <div class="viewfinder-card" id="card-border">
-            <div class="viewport">
-                <video id="video" autoplay playsinline muted></video>
-                <canvas id="snapshot-canvas" style="display:none;"></canvas>
-                <img id="preview-img" style="display:none;" alt="Capture Caméléon">
-                <div class="reticle"></div>
-            </div>
-
-            <div class="color-readout">
-                <div class="color-info">
-                    <div class="color-chip" id="color-chip"></div>
-                    <div class="color-text">
-                        <span>Fréquence Chromatique</span>
-                        <strong id="hex-code">#4CAF50</strong>
-                    </div>
-                </div>
-                <div id="status-badge" style="font-size:0.8rem; color:var(--primary); font-weight:bold;">EN LIGNE</div>
+    <!-- ZONE PRINCIPALE : ORBE VOCALE -->
+    <main class="main-voice-section">
+        <div class="orb-container">
+            <div class="voice-orb" id="micBtn" onclick="startListening()">
+                <!-- Icone Micro -->
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                    <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                </svg>
             </div>
         </div>
+        <div class="status-text" id="status">Appuyez pour parler</div>
+        <div class="user-transcript" id="lastQuery"></div>
+    </main>
 
-        <div class="action-stack">
-            <button id="capture-btn" class="btn btn-primary">
-                <span>Capturer & Adapter</span>
-            </button>
-            <button id="switch-cam-btn" class="btn btn-secondary">
-                <span>Changer de Caméra</span>
-            </button>
-            <button id="proceed-btn" class="btn btn-primary" style="display:none; margin-top:5px;">
-                <span>Entrer dans l'Application</span>
-            </button>
-        </div>
+    <!-- BARRE INFERIEURE AVEC LES BOUTONS CACHES -->
+    <div class="bottom-bar">
+        <button class="action-btn" onclick="openModal()">
+            <span>➕</span> Ajouter Produit
+        </button>
+        <button class="action-btn" onclick="openModal('list')">
+            <span>📦</span> Stock (10)
+        </button>
+    </div>
 
-        <div class="modules-preview">
-            <div class="mod-pill">🎯 Objectifs</div>
-            <div class="mod-pill">💰 Finances</div>
-            <div class="mod-pill">📦 Fournisseurs</div>
+    <!-- PANNEAU CACHÉ (MODAL) -->
+    <div class="modal" id="modalPanel">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Enregistrer un produit</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+
+            <!-- Formulaire pour ajouter -->
+            <form id="productForm" onsubmit="saveProduct(event)">
+                <input type="text" id="prodName" placeholder="Nom (ex: Pain, Lait)" required>
+                <input type="number" step="0.01" id="prodPrice" placeholder="Prix (ex: 2.50)" required>
+                <button type="submit" class="save-btn">MÉMORISER LE PRODUIT</button>
+            </form>
+
+            <!-- Liste des produits de la base -->
+            <div class="product-list" id="productList"></div>
         </div>
     </div>
 
     <script>
-        const video = document.getElementById('video');
-        const snapshotCanvas = document.getElementById('snapshot-canvas');
-        const previewImg = document.getElementById('preview-img');
-        const captureBtn = document.getElementById('capture-btn');
-        const switchCamBtn = document.getElementById('switch-cam-btn');
-        const proceedBtn = document.getElementById('proceed-btn');
-        const colorChip = document.getElementById('color-chip');
-        const hexCode = document.getElementById('hex-code');
-        const brandTitle = document.getElementById('brand-title');
-        const cardBorder = document.getElementById('card-border');
+        // --- 1. BASE DE DONNÉES (10 PRODUITS PRÉ-ENREGISTRÉS) ---
+        const initialProducts = [
+            { name: "lait", price: 1.50 },
+            { name: "pain", price: 1.20 },
+            { name: "sucre", price: 2.00 },
+            { name: "cafe", price: 4.50 },
+            { name: "riz", price: 3.10 },
+            { name: "eau", price: 0.80 },
+            { name: "savon", price: 1.80 },
+            { name: "huile", price: 5.00 },
+            { name: "farine", price: 1.60 },
+            { name: "chocolat", price: 2.30 }
+        ];
 
-        let useFrontCamera = false;
-        let currentStream = null;
-        let isCaptured = false;
+        let inventory = JSON.parse(localStorage.getItem('salvatore_inventory')) || initialProducts;
 
-        // Gestionnaire de flux vidéo robuste avec gestion des erreurs de permissions
-        async function initCamera() {
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-            }
-            const constraints = {
-                video: {
-                    facingMode: useFrontCamera ? 'user' : 'environment',
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
+        function updateProductListUI() {
+            const listDiv = document.getElementById('productList');
+            listDiv.innerHTML = '';
+            inventory.forEach(p => {
+                listDiv.innerHTML += `
+                    <div class="product-item">
+                        <span style="text-transform: capitalize;">${p.name}</span>
+                        <span style="color: var(--red-main); font-weight: bold;">${p.price.toFixed(2)} $</span>
+                    </div>`;
+            });
+            localStorage.setItem('salvatore_inventory', JSON.stringify(inventory));
+        }
+
+        function saveProduct(e) {
+            e.preventDefault();
+            const name = document.getElementById('prodName').value.trim().toLowerCase();
+            const price = parseFloat(document.getElementById('prodPrice').value);
+
+            if (name && !isNaN(price)) {
+                const index = inventory.findIndex(p => p.name === name);
+                if (index !== -1) {
+                    inventory[index].price = price;
+                } else {
+                    inventory.push({ name, price });
                 }
+                updateProductListUI();
+                speak(`Le produit ${name} est enregistré à ${price} dollars.`);
+                document.getElementById('productForm').reset();
+                closeModal();
+            }
+        }
+
+        // --- 2. MODAL CACHÉE ---
+        function openModal() {
+            document.getElementById('modalPanel').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modalPanel').style.display = 'none';
+        }
+
+        // --- 3. SYNTHÈSE VOCALE (Réponse orale) ---
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'fr-FR';
+            utterance.rate = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- 4. RECONNAISSANCE VOCALE (Écoute) ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'fr-FR';
+            recognition.continuous = false;
+
+            recognition.onstart = () => {
+                document.getElementById('micBtn').classList.add('listening');
+                document.getElementById('status').innerText = "Salvatore vous écoute...";
             };
-            try {
-                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = currentStream;
-            } catch (err) {
-                console.warn("Caméra principale introuvable, basculement en mode standard...", err);
+
+            recognition.onend = () => {
+                document.getElementById('micBtn').classList.remove('listening');
+                document.getElementById('status').innerText = "Appuyez pour parler";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                document.getElementById('lastQuery').innerText = `"${transcript}"`;
+                processCommand(transcript);
+            };
+        } else {
+            alert("Votre navigateur ne supporte pas la reconnaissance vocale. Utilisez Chrome sur Android ou Safari sur iPhone.");
+        }
+
+        function startListening() {
+            if (recognition) {
                 try {
-                    currentStream = await navigator.mediaDevices.getUserMedia({ video: true });
-                    video.srcObject = currentStream;
-                } catch (e) {
-                    alert("Accès à la caméra requis pour l'effet Caméléon.");
+                    recognition.start();
+                } catch(e) {
+                    recognition.stop();
                 }
             }
         }
 
-        initCamera();
-
-        switchCamBtn.addEventListener('click', () => {
-            useFrontCamera = !useFrontCamera;
-            initCamera();
-        });
-
-        // Algorithme d'extraction de couleur dominante optimisé
-        captureBtn.addEventListener('click', () => {
-            if (!isCaptured) {
-                snapshotCanvas.width = video.videoWidth || 640;
-                snapshotCanvas.height = video.videoHeight || 480;
-                const ctx = snapshotCanvas.getContext('2d');
-                ctx.drawImage(video, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
-
-                const dataURL = snapshotCanvas.toDataURL('image/png');
-                previewImg.src = dataURL;
-                previewImg.style.display = 'block';
-                video.style.display = 'none';
-
-                // Échantillonnage intelligent de la zone centrale
-                const imgData = ctx.getImageData(
-                    snapshotCanvas.width * 0.25, 
-                    snapshotCanvas.height * 0.25, 
-                    snapshotCanvas.width * 0.5, 
-                    snapshotCanvas.height * 0.5
-                ).data;
-
-                let r = 0, g = 0, b = 0, count = 0;
-                for (let i = 0; i < imgData.length; i += 16) {
-                    r += imgData[i];
-                    g += imgData[i + 1];
-                    b += imgData[i + 2];
-                    count++;
+        // --- 5. INTELLIGENCE DE L'IA ---
+        function processCommand(cmd) {
+            // Traitement pour les prix
+            if (cmd.includes("prix") || cmd.includes("combien") || cmd.includes("coûte") || cmd.includes("c'est combien")) {
+                let found = false;
+                for (let item of inventory) {
+                    if (cmd.includes(item.name)) {
+                        speak(`Le prix du ${item.name} est de ${item.price} dollars.`);
+                        found = true;
+                        break;
+                    }
                 }
-
-                r = Math.floor(r / count);
-                g = Math.floor(g / count);
-                b = Math.floor(b / count);
-
-                const hex = rgbToHex(r, g, b);
-                applyChameleonTheme(r, g, b, hex);
-
-                captureBtn.innerHTML = "<span>Reprendre la photo</span>";
-                proceedBtn.style.display = 'flex';
-                switchCamBtn.style.display = 'none';
-                isCaptured = true;
-            } else {
-                // Réinitialisation
-                previewImg.style.display = 'none';
-                video.style.display = 'block';
-                captureBtn.innerHTML = "<span>Capturer & Adapter</span>";
-                proceedBtn.style.display = 'none';
-                switchCamBtn.style.display = 'flex';
-                isCaptured = false;
+                if (!found) {
+                    speak("Je n'ai pas trouvé ce produit dans le système.");
+                }
+            } 
+            // Domotique
+            else if (cmd.includes("allume") || cmd.includes("éteins") || cmd.includes("ferme") || cmd.includes("ouvre")) {
+                if (cmd.includes("lumière") || cmd.includes("lumieres")) {
+                    if (cmd.includes("allume")) {
+                        document.body.style.backgroundColor = "#2a0808";
+                        speak("Lumières de la boutique allumées.");
+                    } else {
+                        document.body.style.backgroundColor = "#0d0d0d";
+                        speak("Lumières éteintes.");
+                    }
+                } else {
+                    speak("Ordre domotique bien reçu.");
+                }
             }
-        });
-
-        function rgbToHex(r, g, b) {
-            return "#" + [r, g, b].map(x => {
-                const hex = x.toString(16);
-                return hex.length === 1 ? "0" + hex : hex;
-            }).join('').toUpperCase();
-        }
-
-        function applyChameleonTheme(r, g, b, hex) {
-            const rgbString = `${r}, ${g}, ${b}`;
-            const glowColor = `rgba(${rgbString}, 0.4)`;
-
-            document.documentElement.style.setProperty('--primary', hex);
-            document.documentElement.style.setProperty('--primary-glow', glowColor);
-            
-            colorChip.style.background = hex;
-            colorChip.style.boxShadow = `0 0 15px ${hex}`;
-            hexCode.textContent = hex;
-            cardBorder.style.borderColor = hex;
-            cardBorder.style.boxShadow = `0 20px 40px rgba(0,0,0,0.5), 0 0 25px ${glowColor}`;
-
-            // Sauvegarde globale pour objectifs.html, finances.html, fournisseurs.html
-            localStorage.setItem('cameleon_color', hex);
-            localStorage.setItem('cameleon_rgb', rgbString);
-        }
-
-        proceedBtn.addEventListener('click', () => {
-            // Arrêt des flux caméras avant transition
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
+            // Bonjour
+            else if (cmd.includes("bonjour") || cmd.includes("salut")) {
+                speak("Bonjour ! Que puis-je faire pour la boutique ?");
             }
-            window.location.href = 'objectifs.html';
-        });
-
-        // Animation de particules d'arrière-plan interactives
-        const pCanvas = document.getElementById('particle-canvas');
-        const pCtx = pCanvas.getContext('2d');
-        let particles = [];
-
-        function resizeCanvas() {
-            pCanvas.width = window.innerWidth;
-            pCanvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        for (let i = 0; i < 25; i++) {
-            particles.push({
-                x: Math.random() * pCanvas.width,
-                y: Math.random() * pCanvas.height,
-                radius: Math.random() * 2 + 1,
-                speedX: (Math.random() - 0.5) * 0.5,
-                speedY: (Math.random() - 0.5) * 0.5
-            });
+            else {
+                speak("Désolé, je n'ai pas compris la commande.");
+            }
         }
 
-        function animateParticles() {
-            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
-            pCtx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#4CAF50';
-            pCtx.globalAlpha = 0.25;
-
-            particles.forEach(p => {
-                p.x += p.speedX;
-                p.y += p.speedY;
-
-                if (p.x < 0) p.x = pCanvas.width;
-                if (p.x > pCanvas.width) p.x = 0;
-                if (p.y < 0) p.y = pCanvas.height;
-                if (p.y > pCanvas.height) p.y = 0;
-
-                pCtx.beginPath();
-                pCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                pCtx.fill();
-            });
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
+        // Initialisation
+        updateProductListUI();
     </script>
 </body>
 </html>
