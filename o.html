@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JONKESTA ELECTRO - Boutique Pro</title>
+    <!-- Importation d'icônes modernes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --vert: #1b5e20;
+            --vert-light: #2e7d32;
+            --jaune: #ffeb3b;
+            --accent: #ffd600;
+            --gris-clair: #f8f9fa;
+            --sombre: #212121;
+            --shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--gris-clair); 
+            margin: 0; 
+            color: var(--sombre);
+        }
+
+        /* --- DESIGN DU HEADER --- */
+        header { 
+            background: linear-gradient(135deg, var(--vert), #003300); 
+            color: white; 
+            padding: 30px 15px; 
+            text-align: center; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        header h1 { margin: 0; font-size: 2.5em; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        header p { color: var(--jaune); margin-top: 10px; font-weight: 300; }
+
+        .nav-bar { 
+            background: white; 
+            padding: 15px; 
+            text-align: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-bar button { 
+            border-radius: 25px; 
+            margin: 0 10px; 
+            background: var(--vert); 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .nav-bar button:hover { background: var(--sombre); transform: translateY(-2px); }
+
+        /* --- INTERFACE VISITEUR (STYLE ALIBABA) --- */
+        .hero-banner {
+            height: 300px;
+            background: url('https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80') center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            border-radius: 0 0 50px 50px;
+        }
+
+        .hero-text {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px 40px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: 0.3s;
+            border: 1px solid #eee;
+            position: relative;
+        }
+
+        .product-card:hover { transform: translateY(-10px); box-shadow: var(--shadow); }
+
+        .product-img {
+            height: 180px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            color: var(--vert);
+        }
+
+        .product-info { padding: 15px; }
+        .product-price { color: var(--vert); font-weight: bold; font-size: 1.2em; }
+        .product-tag { 
+            position: absolute; top: 10px; left: 10px; 
+            background: var(--jaune); font-size: 0.7em; 
+            padding: 3px 8px; border-radius: 5px; font-weight: bold; 
+        }
+
+        /* --- RESTE DU SYSTEME (CONSERVÉ) --- */
+        .container { padding: 20px; max-width: 1200px; margin: auto; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: var(--shadow); margin-bottom: 25px; }
+        .hidden { display: none; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: var(--vert); color: white; padding: 12px; text-align: left; }
+        td { border-bottom: 1px solid #eee; padding: 12px; }
+        .alerte { background: #ffebee; color: #c62828; }
+
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        .btn-vendre { background: var(--vert); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* Impression */
+        #facture-imprimer { width: 6cm; display: none; font-family: monospace; font-size: 10px; }
+        @media print {
+            body * { visibility: hidden; }
+            #facture-imprimer, #facture-imprimer * { visibility: visible; }
+            #facture-imprimer { position: absolute; left: 0; top: 0; display: block !important; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>JONKESTA ELECTRO <i class="fas fa-bolt"></i></h1>
+    <p>Votre partenaire tech premium - Accessoires & Smartphones</p>
+</header>
+
+<div class="nav-bar">
+    <button onclick="voirCatalogue()"><i class="fas fa-store"></i> Boutique</button>
+    <button onclick="switchRole('employe')"><i class="fas fa-cash-register"></i> Caisse</button>
+    <button onclick="switchRole('admin')"><i class="fas fa-user-shield"></i> Admin</button>
+    <span id="status-tag" style="margin-left:15px; font-weight:bold; color:var(--vert)">Mode: Visiteur</span>
+</div>
+
+<div class="container">
+
+    <!-- SECTION VISITEUR (L'INTERFACE ALIBABA) -->
+    <div id="section-visiteur">
+        <div class="hero-banner">
+            <div class="hero-text">
+                <h2>Nouvelle Arrivage : iPhone 15 Pro & Samsung S24</h2>
+                <p>Livraison rapide dans tout le pays</p>
+            </div>
+        </div>
+        
+        <h2 style="text-align: center; margin-bottom: 30px;">🔥 Nos Meilleures Ventes</h2>
+        <div class="market-grid" id="market-display">
+            <!-- Les produits s'afficheront ici dynamiquement -->
+        </div>
+    </div>
+
+    <!-- INTERFACE ADMIN -->
+    <div id="section-admin" class="hidden">
+        <div class="card">
+            <h2><i class="fas fa-box-open"></i> Entrée en Stock</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <input type="text" id="a_ref" placeholder="Référence">
+                <input type="text" id="a_nom" placeholder="Nom du produit">
+                <input type="number" id="a_qte" placeholder="Quantité">
+                <input type="number" id="a_pa" placeholder="Prix d'Achat (CDF)">
+                <input type="number" id="a_pv" placeholder="Prix de Vente (CDF)">
+                <input type="number" id="a_alerte" placeholder="Seuil Alerte">
+            </div>
+            <button onclick="ajouterProduit()" class="btn-vendre" style="margin-top:20px;">AJOUTER AU STOCK</button>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-chart-line"></i> État du Stock & Bénéfices</h2>
+            <div id="stats-summary" style="background:var(--sombre); color:white; padding:15px; border-radius:10px; margin-bottom:15px;"></div>
+            <table id="table-admin">
+                <thead><tr><th>Réf</th><th>Produit</th><th>Stock</th><th>Action</th></tr></thead>
+                <tbody id="body-admin"></tbody>
+            </table>
+            <button onclick="cloturerJournee()" style="background:#c62828; color:white; border:none; padding:12px; border-radius:8px; margin-top:20px; cursor:pointer;">Clôturer la journée</button>
+        </div>
+    </div>
+
+    <!-- INTERFACE EMPLOYE (CAISSE) -->
+    <div id="section-employe" class="hidden">
+        <div class="card" style="border-top: 5px solid var(--jaune);">
+            <h2><i class="fas fa-shopping-cart"></i> Panier de Vente</h2>
+            <input type="text" id="scan-ref" placeholder="Scannez ou saisissez la référence..." oninput="rechercherProduit(this.value)">
+            
+            <table id="table-panier">
+                <thead><tr><th>Article</th><th>Prix</th><th>Qté</th><th>Total</th></tr></thead>
+                <tbody id="body-panier"></tbody>
+            </table>
+            <h2 style="text-align: right; color: var(--vert);">Total : <span id="total-panier">0</span> CDF</h2>
+            
+            <input type="text" id="nom-client" placeholder="Nom du client (Optionnel)">
+            <button onclick="validerVente()" class="btn-vendre">VALIDER & IMPRIMER FACTURE</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ZONE D'IMPRESSION -->
+<div id="facture-imprimer">
+    <center>
+        <strong>JONKESTA ELECTRO</strong><br>
+        Vente Accessoires High-Tech<br>
+        --------------------------<br>
+        <span id="f-date"></span><br>
+        Client: <span id="f-client"></span><br>
+        --------------------------
+    </center>
+    <div id="f-items"></div>
+    --------------------------<br>
+    <strong>TOTAL : <span id="f-total"></span> CDF</strong><br><br>
+    <center>Merci de votre visite !</center>
+</div>
+
+<script>
+    // --- DONNEES ---
+    let stock = JSON.parse(localStorage.getItem('stock')) || [];
+    let journal = JSON.parse(localStorage.getItem('journal')) || [];
+    let depenses = JSON.parse(localStorage.getItem('depenses')) || 0;
+    let panier = [];
+    const ADMIN_PASS = "admin123";
+
+    // --- FONCTION D'AFFICHAGE D'ICONES ---
+    // Cette fonction choisit une icone selon le nom du produit
+    function getIcon(nom) {
+        nom = nom.toLowerCase();
+        if(nom.includes('iphone') || nom.includes('phone') || nom.includes('tel')) return 'fa-mobile-screen-button';
+        if(nom.includes('cable') || nom.includes('chargeur')) return 'fa-bolt';
+        if(nom.includes('ecouteur') || nom.includes('airpod')) return 'fa-headphones';
+        if(nom.includes('montre') || nom.includes('watch')) return 'fa-stopwatch';
+        return 'fa-box';
+    }
+
+    // --- LOGIQUE NAVIGATION ---
+    function voirCatalogue() {
+        document.getElementById('section-visiteur').classList.remove('hidden');
+        document.getElementById('section-admin').classList.add('hidden');
+        document.getElementById('section-employe').classList.add('hidden');
+        document.getElementById('status-tag').innerText = "Mode: Visiteur";
+        majAffichage();
+    }
+
+    function switchRole(role) {
+        if (role === 'admin') {
+            let p = prompt("Mot de passe Administrateur :");
+            if (p !== ADMIN_PASS) return alert("Accès refusé");
+        }
+        document.getElementById('section-visiteur').classList.add('hidden');
+        document.getElementById('section-admin').classList.toggle('hidden', role !== 'admin');
+        document.getElementById('section-employe').classList.toggle('hidden', role !== 'employe');
+        document.getElementById('status-tag').innerText = "Mode: " + role.toUpperCase();
+        majAffichage();
+    }
+
+    // --- LOGIQUE PRODUITS ---
+    function ajouterProduit() {
+        const p = {
+            ref: document.getElementById('a_ref').value,
+            nom: document.getElementById('a_nom').value,
+            qte: parseInt(document.getElementById('a_qte').value),
+            pa: parseFloat(document.getElementById('a_pa').value),
+            pv: parseFloat(document.getElementById('a_pv').value),
+            alerte: parseInt(document.getElementById('a_alerte').value)
+        };
+        if(!p.ref || !p.nom) return alert("Veuillez remplir les champs");
+        stock.push(p);
+        sauvegarder();
+        alert("Produit ajouté au catalogue !");
+    }
+
+    function rechercherProduit(ref) {
+        let prod = stock.find(i => i.ref === ref);
+        if(prod) {
+            let qte = prompt("Quantité pour " + prod.nom + " ?", 1);
+            if(qte > prod.qte) return alert("Stock insuffisant !");
+            panier.push({ ...prod, qteVente: parseInt(qte) });
+            document.getElementById('scan-ref').value = "";
+            majPanier();
+        }
+    }
+
+    function majPanier() {
+        let html = ""; let total = 0;
+        panier.forEach(item => {
+            let st = item.pv * item.qteVente;
+            total += st;
+            html += `<tr><td>${item.nom}</td><td>${item.pv}</td><td>${item.qteVente}</td><td>${st}</td></tr>`;
+        });
+        document.getElementById('body-panier').innerHTML = html;
+        document.getElementById('total-panier').innerText = total.toLocaleString();
+    }
+
+    function validerVente() {
+        if(panier.length === 0) return;
+        let totalVente = 0;
+        let totalBenef = 0;
+        let detailsFacture = "";
+
+        panier.forEach(item => {
+            let sIdx = stock.findIndex(s => s.ref === item.ref);
+            stock[sIdx].qte -= item.qteVente;
+            totalVente += (item.pv * item.qteVente);
+            totalBenef += (item.pv - item.pa) * item.qteVente;
+            detailsFacture += `${item.nom} x${item.qteVente} : ${item.pv * item.qteVente} CDF<br>`;
+        });
+
+        journal.push({ date: new Date().toLocaleTimeString(), montant: totalVente, benef: totalBenef });
+        
+        // Prep facture
+        document.getElementById('f-date').innerText = new Date().toLocaleString();
+        document.getElementById('f-client').innerText = document.getElementById('nom-client').value || "Client Divers";
+        document.getElementById('f-items').innerHTML = detailsFacture;
+        document.getElementById('f-total').innerText = totalVente.toLocaleString();
+
+        window.print();
+        panier = [];
+        majPanier();
+        sauvegarder();
+    }
+
+    // --- MISE A JOUR AFFICHAGE GLOBAL ---
+    function majAffichage() {
+        // Catalogue Visiteur (Style Alibaba)
+        let marketHtml = "";
+        // On affiche soit le stock, soit des produits fictifs si vide
+        let listeAffiche = stock.length > 0 ? stock : Array(8).fill({nom: "Exemple Produit", pv: 15000, ref: '000'});
+        
+        listeAffiche.forEach(p => {
+            marketHtml += `
+                <div class="product-card">
+                    <div class="product-tag">NEW</div>
+                    <div class="product-img">
+                        <i class="fas ${getIcon(p.nom)}"></i>
+                    </div>
+                    <div class="product-info">
+                        <div style="font-weight:bold; height:40px">${p.nom}</div>
+                        <div class="product-price">${p.pv.toLocaleString()} CDF</div>
+                        <div style="font-size:0.8em; color:gray">Stock disponible: ${p.qte || 'En cours'}</div>
+                        <button onclick="switchRole('employe')" style="width:100%; margin-top:10px; border-radius:5px; border:1px solid var(--vert); background:none; color:var(--vert); cursor:pointer">Acheter</button>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('market-display').innerHTML = marketHtml;
+
+        // Admin Table
+        let hAdmin = "";
+        let totalV = 0; let totalB = 0;
+        stock.forEach((p, idx) => {
+            let cl = p.qte <= p.alerte ? 'alerte' : '';
+            hAdmin += `<tr class="${cl}"><td>${p.ref}</td><td>${p.nom}</td><td>${p.qte}</td>
+            <td><button onclick="supprimerProd(${idx})">🗑️</button></td></tr>`;
+        });
+        document.getElementById('body-admin').innerHTML = hAdmin;
+
+        journal.forEach(v => { totalV += v.montant; totalB += v.benef; });
+        document.getElementById('stats-summary').innerHTML = `
+            <div style="display:flex; justify-content:space-around">
+                <span>💰 CA: ${totalV.toLocaleString()} CDF</span>
+                <span>📈 Profit: ${(totalB - depenses).toLocaleString()} CDF</span>
+            </div>
+        `;
+    }
+
+    function sauvegarder() {
+        localStorage.setItem('stock', JSON.stringify(stock));
+        localStorage.setItem('journal', JSON.stringify(journal));
+        localStorage.setItem('depenses', JSON.stringify(depenses));
+        majAffichage();
+    }
+
+    function supprimerProd(i) {
+        if(confirm("Supprimer ?")) { stock.splice(i,1); sauvegarder(); }
+    }
+
+    function cloturerJournee() {
+        if(confirm("Clôturer ?")) {
+            window.print();
+            journal = []; depenses = 0; sauvegarder();
+        }
+    }
+
+    // Initialisation
+    majAffichage();
+</script>
+
+</body>
+</html>
