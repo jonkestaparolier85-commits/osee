@@ -3,505 +3,376 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Téléphone Virtuel - JONKESTA P</title>
+    <title>Roger Bwana - Expert en Santé Publique</title>
     <!-- Font Awesome pour les icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* CSS RESET & VARIABLES */
         :root {
-            /* Nuances de rose (Shades of Pink) */
-            --pink-deep: #880e4f;
-            --pink-dark: #c2185b;
-            --pink-main: #e91e63;
-            --pink-medium: #f06292;
-            --pink-light: #f8bbd0;
-            --pink-ultra-light: #fce4ec;
-            --pink-gradient: linear-gradient(135deg, #ff4081, #c2185b, #880e4f);
-            --bg-glass: rgba(255, 255, 255, 0.25);
-            --border-glass: rgba(255, 255, 255, 0.4);
+            --primary: #0056b3;
+            --primary-dark: #003d82;
+            --secondary: #28a745;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+            --light-text: #6c757d;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            user-select: none;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
 
         body {
-            background-color: #12000b;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
         }
 
-        /* Coque et structure du téléphone */
-        .phone-container {
-            width: 360px;
-            height: 740px;
-            background: #2a081a;
-            border-radius: 48px;
-            padding: 12px;
-            box-shadow: 0 20px 50px rgba(233, 30, 99, 0.3),
-                        0 0 0 4px #e91e63,
-                        0 0 0 8px #880e4f;
-            position: relative;
-        }
-
-        /* Encoche / Dynamic Island */
-        .camera-notch {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 25px;
-            background: #000;
-            border-radius: 20px;
+        /* HEADER & NAVIGATION */
+        header {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
             z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding-right: 12px;
         }
 
-        .camera-lens {
-            width: 10px;
-            height: 10px;
-            background: #111;
-            border-radius: 50%;
-            border: 1px solid #333;
-        }
-
-        /* Écran principal */
-        .screen {
-            width: 100%;
-            height: 100%;
-            background: var(--pink-gradient);
-            border-radius: 38px;
-            overflow: hidden;
-            position: relative;
-            color: white;
-        }
-
-        /* ----------------------------------
-           ANIMATION DE DÉMARRAGE (7 SECONDES)
-        ---------------------------------- */
-        .boot-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #0d0007;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 900;
-            animation: fadeOutBoot 0.5s ease-in-out 6.5s forwards;
-        }
-
-        .boot-logo {
-            font-size: 2.2rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-            background: linear-gradient(45deg, #ff80ab, #ff4081, #f50057);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            animation: pulseLogo 2s infinite alternate;
-        }
-
-        .boot-subtitle {
-            font-size: 0.9rem;
-            color: var(--pink-light);
-            letter-spacing: 4px;
-            margin-bottom: 50px;
-            text-transform: uppercase;
-        }
-
-        /* Barre de chargement réglée exactement sur 7s */
-        .loader-bar-container {
-            width: 60%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid var(--pink-dark);
-        }
-
-        .loader-bar {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--pink-medium), var(--pink-light));
-            box-shadow: 0 0 10px var(--pink-main);
-            animation: loadProgress 7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-
-        @keyframes loadProgress {
-            0% { width: 0%; }
-            20% { width: 15%; }
-            50% { width: 45%; }
-            80% { width: 85%; }
-            100% { width: 100%; }
-        }
-
-        @keyframes pulseLogo {
-            0% { transform: scale(0.98); opacity: 0.8; }
-            100% { transform: scale(1.05); filter: drop-shadow(0 0 15px var(--pink-main)); opacity: 1; }
-        }
-
-        @keyframes fadeOutBoot {
-            to { opacity: 0; visibility: hidden; }
-        }
-
-        /* ----------------------------------
-           BARRE D'ÉTAT (Top Bar)
-        ---------------------------------- */
-        .status-bar {
-            height: 40px;
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 25px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            position: absolute;
-            top: 0;
-            width: 100%;
-            z-index: 800;
+            padding: 1rem 1.5rem;
         }
 
-        .status-icons i {
-            margin-left: 5px;
-        }
-
-        /* ----------------------------------
-           ÉCRAN D'ACCUEIL (OS JONKESTA P)
-        ---------------------------------- */
-        .home-screen {
-            height: 100%;
-            padding: 50px 20px 20px 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .clock-widget {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .clock-widget .time {
-            font-size: 3.5rem;
-            font-weight: 300;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        .clock-widget .date {
-            font-size: 0.9rem;
-            color: var(--pink-ultra-light);
-            text-transform: capitalize;
-        }
-
-        /* Grille d'applications */
-        .app-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px 10px;
-            margin-bottom: 20px;
-        }
-
-        .app-icon-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .app-icon-wrapper:active {
-            transform: scale(0.9);
-        }
-
-        .app-icon {
-            width: 58px;
-            height: 58px;
-            border-radius: 18px;
-            background: var(--bg-glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-glass);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .logo {
             font-size: 1.5rem;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-            color: white;
-        }
-
-        .app-icon.special-jonk {
-            background: linear-gradient(135deg, #ffffff, var(--pink-light));
-            color: var(--pink-deep);
-            border: 2px solid var(--pink-light);
-            box-shadow: 0 8px 20px rgba(240, 98, 146, 0.4);
-        }
-
-        .app-name {
-            font-size: 0.75rem;
-            margin-top: 6px;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            width: 68px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
-
-        /* Dock (Applications du bas) */
-        .dock {
-            background: var(--bg-glass);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border-glass);
-            border-radius: 25px;
-            padding: 10px 15px;
-            display: flex;
-            justify-content: space-around;
-        }
-
-        /* ----------------------------------
-           APPLICATION GESTION JONK
-        ---------------------------------- */
-        .app-window {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #fff;
-            z-index: 700;
-            display: flex;
-            flex-direction: column;
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
-            color: #333;
-        }
-
-        .app-window.open {
-            transform: translateY(0);
-        }
-
-        /* Header de l'application avec Logo et Nom */
-        .app-header {
-            background: var(--pink-gradient);
-            color: white;
-            padding: 40px 15px 12px 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .app-header-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .app-header-logo {
-            width: 32px;
-            height: 32px;
-            background: white;
-            color: var(--pink-dark);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-
-        .app-header-name {
-            font-size: 1.1rem;
             font-weight: 700;
-            letter-spacing: 0.5px;
+            color: var(--primary);
         }
 
-        /* Conteneur pour inclure o.html */
-        .app-body {
-            flex: 1;
-            width: 100%;
-            border: none;
-            background: #fafafa;
+        .logo span {
+            color: var(--secondary);
         }
 
-        /* Barre de navigation du bas (Bouton Accueil) */
-        .nav-bar-bottom {
-            height: 25px;
-            display: flex;
-            justify-content: center;
+        /* HERO SECTION */
+        .hero {
+            background: linear-gradient(135deg, rgba(0, 86, 179, 0.95), rgba(0, 61, 130, 0.9)), url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1350&q=80') center/cover;
+            color: var(--white);
+            padding: 8rem 1.5rem 5rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .hero p.subtitle {
+            font-size: 1.3rem;
+            color: #e0e0e0;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+
+        .academic-badge {
+            display: inline-flex;
             align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        /* BUTTONS */
+        .btn-whatsapp {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background-color: #25D366;
+            color: var(--white);
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.4);
+            transition: var(--transition);
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #1eb954;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(37, 211, 102, 0.6);
+        }
+
+        /* SECTIONS GENERAL */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            position: relative;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+
+        .section-title h2::after {
+            content: '';
             position: absolute;
             bottom: 0;
-            width: 100%;
-            z-index: 850;
-            cursor: pointer;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
         }
 
-        .home-indicator {
-            width: 120px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 10px;
+        /* EXPERTISE GRID */
+        .expertise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
         }
 
-        .app-window .home-indicator {
-            background: rgba(0, 0, 0, 0.3);
+        .card {
+            background: var(--white);
+            padding: 2.5rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+            border-top: 4px solid var(--primary);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1.2rem;
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: var(--dark-text);
+        }
+
+        .card p {
+            color: var(--light-text);
+            font-size: 0.95rem;
+        }
+
+        /* ABOUT / PARCOURS SECTION */
+        .about-section {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 4rem;
+        }
+
+        .about-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+            text-align: center;
+        }
+
+        .unilu-tag {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* CONTACT SECTION */
+        .contact-box {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .contact-box h2 {
+            margin-bottom: 1rem;
+        }
+
+        .contact-box p {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* FOOTER */
+        footer {
+            background: #111827;
+            color: #9ca3af;
+            text-align: center;
+            padding: 2rem 1.5rem;
+            margin-top: 4rem;
+            font-size: 0.9rem;
+        }
+
+        /* RESPONSIVE DESIGN (PETITS ÉCRANS) */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p.subtitle {
+                font-size: 1.1rem;
+            }
+
+            .container {
+                padding: 2.5rem 1rem;
+            }
+
+            .about-section {
+                padding: 2rem 1.2rem;
+            }
+
+            .btn-whatsapp {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Structure du Téléphone -->
-    <div class="phone-container">
-        <!-- Dynamic Island / Caméra -->
-        <div class="camera-notch">
-            <div class="camera-lens"></div>
+    <!-- HEADER -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">Roger <span>Bwana</span></div>
+            <a href="https://wa.me/243893815393" target="_blank" class="btn-whatsapp" style="padding: 0.5rem 1.2rem; font-size: 0.9rem;">
+                <i class="fab !fa-whatsapp"></i> WhatsApp
+            </a>
         </div>
+    </header>
 
-        <div class="screen">
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Roger Bwana</h1>
+            <p class="subtitle">Expert en Santé Publique & Consultant Sanitaire</p>
             
-            <!-- 1. Écran d'animation de démarrage (7 secondes) -->
-            <div class="boot-screen" id="bootScreen">
-                <div class="boot-logo"><i class="fa-solid fa-mobile-screen-button"></i> JONKESTA P</div>
-                <div class="boot-subtitle">OS Mobile</div>
-                <div class="loader-bar-container">
-                    <div class="loader-bar"></div>
-                </div>
+            <div class="academic-badge">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Diplômé de l'Université de Lubumbashi (UNILU)</span>
             </div>
 
-            <!-- Barre d'état commune -->
-            <div class="status-bar">
-                <span id="currentTime">12:00</span>
-                <div class="status-icons">
-                    <i class="fa-solid fa-signal"></i>
-                    <i class="fa-solid fa-wifi"></i>
-                    <i class="fa-solid fa-battery-full"></i>
-                </div>
+            <div>
+                <a href="https://wa.me/243893815393?text=Bonjour%20Roger%20Bwana,%20je%20souhaite%20en%20savoir%20plus%20sur%20vos%20services%20en%20sant%C3%A9%20publique." target="_blank" class="btn-whatsapp">
+                    <i class="fab fa-whatsapp"></i> Me contacter sur WhatsApp
+                </a>
             </div>
-
-            <!-- 2. Écran d'accueil principal -->
-            <div class="home-screen">
-                <div class="clock-widget">
-                    <div class="time" id="widgetTime">12:00</div>
-                    <div class="date" id="widgetDate">Lundi 12 Octobre</div>
-                </div>
-
-                <!-- Grille d'applications -->
-                <div class="app-grid">
-                    <!-- Application demandée : Gestion JONK -->
-                    <div class="app-icon-wrapper" onclick="openApp()">
-                        <div class="app-icon special-jonk">
-                            <i class="fa-solid fa-chart-pie"></i>
-                        </div>
-                        <span class="app-name">Gestion JONK</span>
-                    </div>
-
-                    <!-- Icônes décoratives du système -->
-                    <div class="app-icon-wrapper">
-                        <div class="app-icon"><i class="fa-solid fa-camera"></i></div>
-                        <span class="app-name">Appareil</span>
-                    </div>
-                    <div class="app-icon-wrapper">
-                        <div class="app-icon"><i class="fa-solid fa-images"></i></div>
-                        <span class="app-name">Galerie</span>
-                    </div>
-                    <div class="app-icon-wrapper">
-                        <div class="app-icon"><i class="fa-solid fa-gear"></i></div>
-                        <span class="app-name">Réglages</span>
-                    </div>
-                    <div class="app-icon-wrapper">
-                        <div class="app-icon"><i class="fa-solid fa-envelope"></i></div>
-                        <span class="app-name">Messages</span>
-                    </div>
-                    <div class="app-icon-wrapper">
-                        <div class="app-icon"><i class="fa-solid fa-music"></i></div>
-                        <span class="app-name">Musique</span>
-                    </div>
-                </div>
-
-                <!-- Dock fixe en bas -->
-                <div class="dock">
-                    <div class="app-icon-wrapper">
-                        <div class="app-icon"><i class="fa-solid fa-phone"></i></div>
-                    </div>
-                    <div class="app-icon-wrapper">
-                        <div class="app-icon"><i class="fa-solid fa-globe"></i></div>
-                    </div>
-                    <div class="app-icon-wrapper">
-                        <div class="app-icon"><i class="fa-solid fa-comment-dots"></i></div>
-                    </div>
-                    <div class="app-icon-wrapper" onclick="openApp()">
-                        <div class="app-icon special-jonk"><i class="fa-solid fa-folder-closed"></i></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. Fenêtre de l'application : Gestion JONK -->
-            <div class="app-window" id="jonkApp">
-                <div class="app-header">
-                    <div class="app-header-title">
-                        <div class="app-header-logo">
-                            <i class="fa-solid fa-chart-pie"></i>
-                        </div>
-                        <span class="app-header-name">Gestion JONK</span>
-                    </div>
-                    <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="closeApp()"></i>
-                </div>
-                <!-- Intégration directe du fichier o.html -->
-                <iframe class="app-body" src="o.html" title="Gestion JONK Content"></iframe>
-            </div>
-
-            <!-- Barre Indicateur Home (Pour fermer l'application) -->
-            <div class="nav-bar-bottom" onclick="closeApp()">
-                <div class="home-indicator"></div>
-            </div>
-
         </div>
-    </div>
+    </section>
 
-    <script>
-        // Gestion de l'Horloge
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            
-            document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
-            document.getElementById('widgetTime').textContent = `${hours}:${minutes}`;
+    <!-- CONTENU PRINCIPAL -->
+    <main class="container">
 
-            const options = { weekday: 'long', day: 'numeric', month: 'long' };
-            document.getElementById('widgetDate').textContent = now.toLocaleDateString('fr-FR', options);
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+        <!-- PARCOURS ET ENGAGEMENT -->
+        <section class="about-section">
+            <div class="about-content">
+                <i class="fas fa-user-md" style="font-size: 3rem; color: var(--primary);"></i>
+                <h2>À propos de l'Expert</h2>
+                <p>
+                    Fort d'une formation universitaire rigoureuse acquise à l'<strong>Université de Lubumbashi (UNILU)</strong>, 
+                    <strong>Roger Bwana</strong> met son expertise en santé publique au service de la prévention, 
+                    de l'organisation des soins, de la gestion des épidémies et de la promotion de la santé communautaire.
+                </p>
+            </div>
+        </section>
 
-        // Fonctions pour ouvrir et fermer l'application Gestion JONK
-        function openApp() {
-            document.getElementById('jonkApp').classList.add('open');
-        }
+        <!-- DOMAINES D'EXPERTISE -->
+        <section>
+            <div class="section-title">
+                <h2>Domaines d'Expertise</h2>
+            </div>
 
-        function closeApp() {
-            document.getElementById('jonkApp').classList.remove('open');
-        }
+            <div class="expertise-grid">
+                <!-- Carte 1 -->
+                <div class="card">
+                    <i class="fas fa-chart-line card-icon"></i>
+                    <h3>Épidémiologie & Surveillance</h3>
+                    <p>Analyse des données sanitaires, suivi des pathologies à potentiel épidémique et gestion des risques de santé publique.</p>
+                </div>
 
-        // Dissimulation automatique du Boot Screen après l'animation (7s)
-        setTimeout(() => {
-            const bootScreen = document.getElementById('bootScreen');
-            bootScreen.style.display = 'none';
-        }, 7000);
-    </script>
+                <!-- Carte 2 -->
+                <div class="card">
+                    <i class="fas fa-hands-helping card-icon"></i>
+                    <h3>Santé Communautaire</h3>
+                    <p>Conception et mise en œuvre de programmes de sensibilisation, de prévention et de promotion de la santé globale.</p>
+                </div>
+
+                <!-- Carte 3 -->
+                <div class="card">
+                    <i class="fas fa-hospital-user card-icon"></i>
+                    <h3>Gestion des Services de Santé</h3>
+                    <p>Optimisation du fonctionnement des structures de santé et planification stratégique des politiques sanitaires.</p>
+                </div>
+
+                <!-- Carte 4 -->
+                <div class="card">
+                    <i class="fas fa-file-medical-alt card-icon"></i>
+                    <h3>Études & Projets Sanitaires</h3>
+                    <p>Évaluation des besoins des populations, rédaction de rapports d'impact et suivi-évaluation de projets de santé.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION CONTACT DIRECT -->
+        <section style="margin-top: 5rem;">
+            <div class="contact-box">
+                <h2>Besoin d'une consultation ou d'un partenariat ?</h2>
+                <p>N'hésitez pas à me contacter directement sur WhatsApp pour discuter de vos projets ou solliciter une expertise en santé publique.</p>
+                <a href="https://wa.me/243893815393?text=Bonjour%20Roger%20Bwana,%20je%20souhaite%20une%20consultation." target="_blank" class="btn-whatsapp">
+                    <i class="fab fa-whatsapp"></i> Écrire au 0893815393
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 Roger Bwana - Expert en Santé Publique. Tous droits réservés.</p>
+    </footer>
+
 </body>
 </html>
